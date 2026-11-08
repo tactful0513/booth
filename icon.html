@@ -229,9 +229,9 @@ const FRAMES = {
   snow:{name:"겨울 눈꽃", pat:"snow", bg:"#1B2A4A", fg:"#ffffff", sub:"#BFD8F5", r:.6, plate:"#1B2A4Ae0", slot:"#24385E"}
 };
 const DEF_PROMPT = {
-  roblox: "Recreate this entire photo as a fully 3D-rendered scene from the game Roblox. Convert EVERYTHING in the image, not just the faces. (1) Every person becomes a complete Roblox avatar from head to toe: a blocky Roblox head with a simple classic Roblox cartoon face, a rectangular blocky torso, and straight blocky arms and legs with a smooth plastic toy material. No realistic skin, hands, necks or human body proportions may remain. (2) Their real clothes become Roblox shirt and pants textures with the same colors and patterns, and their hairstyle, hair color, glasses, hats and held items become matching Roblox accessories, so each person is still recognizable. (3) The whole background and every object (walls, floor, windows, doors, desks, chairs, trees, sky) is rebuilt from smooth Roblox Studio blocks and simple low-poly parts with bright plastic materials, keeping the same layout and colors as the original place. Keep the same number of people, their left-to-right positions and poses, and the same camera framing. Bright soft game lighting. Nothing in the image should look like a real photograph. No text, no logos, no game UI, no watermark."
+  roblox: "A screenshot from the 3D online game Roblox. Everything in the image is made of Roblox parts. The characters are classic Roblox avatars from head to toe: blocky heads with simple smiling decal faces, rectangular blocky torsos and straight blocky arms and legs, wearing Roblox shirt and pants textures, with hair, glasses and hats as Roblox accessory meshes. The whole environment is built in Roblox Studio from smooth plastic blocks and simple low-poly parts with bright saturated colors and soft game lighting. No real humans, no photographic textures, no text, no game UI, no watermark."
 };
-const OLD_PROMPTS = ["Transform the person or people in this photo into 3D blocky game avatars in the style of Roblox: cube-shaped heads with simple friendly cartoon faces, blocky torsos and limbs, smooth plastic toy-like look, bright soft studio lighting. Keep the same number of people in the same positions and poses, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns and any items they hold, so each person stays recognizable. Keep the camera framing of the original photo and turn the background into a clean, colorful 3D game-world version of the same place. No text, no logos, no watermark."];   // 예전 기본 프롬프트가 저장된 기기는 새 기본값으로 바꿔 씀
+const OLD_PROMPTS = ["Recreate this entire photo as a fully 3D-rendered scene from the game Roblox. Convert EVERYTHING in the image, not just the faces. (1) Every person becomes a complete Roblox avatar from head to toe: a blocky Roblox head with a simple classic Roblox cartoon face, a rectangular blocky torso, and straight blocky arms and legs with a smooth plastic toy material. No realistic skin, hands, necks or human body proportions may remain. (2) Their real clothes become Roblox shirt and pants textures with the same colors and patterns, and their hairstyle, hair color, glasses, hats and held items become matching Roblox accessories, so each person is still recognizable. (3) The whole background and every object (walls, floor, windows, doors, desks, chairs, trees, sky) is rebuilt from smooth Roblox Studio blocks and simple low-poly parts with bright plastic materials, keeping the same layout and colors as the original place. Keep the same number of people, their left-to-right positions and poses, and the same camera framing. Bright soft game lighting. Nothing in the image should look like a real photograph. No text, no logos, no game UI, no watermark.", "Transform the person or people in this photo into 3D blocky game avatars in the style of Roblox: cube-shaped heads with simple friendly cartoon faces, blocky torsos and limbs, smooth plastic toy-like look, bright soft studio lighting. Keep the same number of people in the same positions and poses, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns and any items they hold, so each person stays recognizable. Keep the camera framing of the original photo and turn the background into a clean, colorful 3D game-world version of the same place. No text, no logos, no watermark."];   // 예전 기본 프롬프트가 저장된 기기는 새 기본값으로 바꿔 씀
 const DEF_MODEL = {gemini:"gemini-2.5-flash-image", openai:"gpt-image-1"};
 
 const S = {
@@ -516,17 +516,27 @@ function toB64(img, max=1024){
   c.width = Math.round(img.naturalWidth*s); c.height = Math.round(img.naturalHeight*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
   const u = c.toDataURL("image/jpeg",.9).split(",")[1]; free(c); return u;
 }
+async function gem(C, parts, mods, extra){
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(C.model)}:generateContent`, {
+    method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":C.key},
+    body: JSON.stringify({contents:[{parts}], generationConfig:{responseModalities:mods, ...extra}})
+  });
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(j.error?.message || ("HTTP "+r.status));
+  return j.candidates?.[0]?.content?.parts || [];
+}
+const DESCRIBE = "Describe this photo for a 3D artist who will rebuild it as a Roblox game scene. Answer in English, under 130 words, as one paragraph: the number of people; for each person from left to right, their pose, facial expression, hairstyle and hair color, glasses or other accessories, clothing type with colors and patterns, and anything they hold; the place and background with its main objects and colors; the camera framing (close-up, half body or full body). Do not guess names, identity or age.";
 async function aiImage(img, C){
   const b64 = toB64(img);
   if (!C.key) throw new Error("API 키가 없어요. [⚙ AI 설정]에서 넣어 주세요.");
   if (C.prov === "gemini"){
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(C.model)}:generateContent`, {
-      method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":C.key},
-      body: JSON.stringify({contents:[{parts:[{text:C.prompt},{inlineData:{mimeType:"image/jpeg",data:b64}}]}], generationConfig:{responseModalities:["TEXT","IMAGE"]}})
-    });
-    const j = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(j.error?.message || ("HTTP "+r.status));
-    const part = (j.candidates?.[0]?.content?.parts||[]).find(p=>p.inlineData||p.inline_data);
+    // ① 사진을 글로 묘사 → ② 원본 사진 없이 그 묘사로 새로 그림. 원본 픽셀을 안 쓰니 몸·옷·배경까지 전부 로블록스풍이 됨
+    const desc = (await gem(C, [{inlineData:{mimeType:"image/jpeg",data:b64}},{text:DESCRIBE}], ["TEXT"])).map(p=>p.text||"").join(" ").trim();
+    if (!desc) throw new Error("사진 분석에 실패했어요. 다시 시도해 주세요.");
+    const txt = [{text: C.prompt + " Recreate this scene in that style, keeping the same number of characters, their left-to-right order and poses, clothing colors, hairstyles, accessories, the place and the camera framing: " + desc}];
+    const ar = img.naturalWidth >= img.naturalHeight ? "4:3" : "3:4";
+    let parts; try { parts = await gem(C, txt, ["TEXT","IMAGE"], {imageConfig:{aspectRatio:ar}}); } catch(e){ parts = await gem(C, txt, ["TEXT","IMAGE"]); }
+    const part = parts.find(p=>p.inlineData||p.inline_data);
     if (!part) throw new Error("이미지가 오지 않았어요 (안전 필터 또는 응답 오류). 다시 시도해 주세요.");
     const d = part.inlineData || part.inline_data; return loadImg(`data:${d.mimeType||d.mime_type||"image/png"};base64,${d.data}`);
   }
