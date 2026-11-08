@@ -176,6 +176,9 @@ button,.th,.qi{touch-action:manipulation}
       <div class="row"><button id="bTest">연결 테스트</button><button class="pri" id="bSetOk">저장</button></div>
     </div>
     <div id="setMsg"></div>
+    <div class="row" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"><button id="bQR">📱 다른 기기에 키 옮기기 (QR)</button></div>
+    <div id="qrBox" style="display:none;text-align:center;margin-top:10px"><div id="qr" style="display:inline-block;padding:10px;background:#fff"></div>
+      <p class="note">다른 폰·아이패드의 <b>기본 카메라</b>로 이 QR을 찍고 사파리에서 열면, 그 기기에 키가 저장돼요(두 앱 모두).<br>QR에 키가 들어 있으니 캡처하거나 단톡방에 올리지 마세요.</p></div>
   </div>
 </div>
 
@@ -296,7 +299,7 @@ $("#bClearDone").onclick = () => { S.list = S.list.filter(e=>e.status!=="printed
 $("#bClearAll").onclick = () => { if (S.list.length && confirm("명단과 사진·캐릭터를 모두 지울까요?")){ S.list = []; S.sel = null; store.set("frame.no",0); drawQueue(); render(); } };
 
 // ---------- AI 변환 ----------
-const cfg = () => { const prov = store.get("frame.prov","gemini"); return {prov, key: sessionKey || store.get("frame.key",""),
+const cfg = () => { const prov = store.get("frame.prov","gemini"); return {prov, key: sessionKey || store.get("baro.key","") || store.get("frame.key",""),
   model: store.get("frame.model."+prov, DEF_MODEL[prov]), prompt: store.get("frame.prompt", DEF_PROMPT)}; };
 function toB64(img, max=1024){
   const s = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight)), c = document.createElement("canvas");
@@ -523,12 +526,12 @@ $("#bPrinted").onclick = () => { const e = cur(); if (!e) return; e.status = "pr
 // ---------- 설정 ----------
 function openSet(){ const C = cfg(); $("#sProv").value=C.prov; $("#tKey").value=C.key; $("#tModel").value=C.model; $("#tPrompt").value=C.prompt;
   $("#cSaveKey").checked = store.get("frame.savekey","1")==="1"; $("#setMsg").innerHTML=""; $("#mSet").classList.add("on"); }
-$("#bSet").onclick = openSet;
+$("#bSet").onclick = () => { $("#qrBox").style.display = "none"; openSet(); };
 $("#sProv").onchange = () => { $("#tModel").value = store.get("frame.model."+$("#sProv").value, DEF_MODEL[$("#sProv").value]); };
 $("#bPromptReset").onclick = () => $("#tPrompt").value = DEF_PROMPT;
 function saveSet(){ const prov = $("#sProv").value; store.set("frame.prov",prov); store.set("frame.model."+prov, $("#tModel").value.trim()||DEF_MODEL[prov]);
   store.set("frame.prompt", $("#tPrompt").value.trim()||DEF_PROMPT); sessionKey = $("#tKey").value.trim();
-  store.set("frame.savekey", $("#cSaveKey").checked?"1":"0"); store.set("frame.key", $("#cSaveKey").checked ? sessionKey : ""); }
+  store.set("frame.savekey", $("#cSaveKey").checked?"1":"0"); store.set("baro.key", $("#cSaveKey").checked ? sessionKey : ""); store.set("frame.key", ""); }
 $("#bSetOk").onclick = () => { saveSet(); $("#mSet").classList.remove("on"); toast("저장했어요"); };
 $("#bTest").onclick = async () => {
   saveSet(); $("#setMsg").innerHTML = `<div class="note" style="margin-top:8px">테스트 이미지로 변환해 보는 중… (약 10~30초, 1장 요금 발생)</div>`;
@@ -536,6 +539,18 @@ $("#bTest").onclick = async () => {
   g.fillStyle="#cfe8ff"; g.fillRect(0,0,256,256); g.fillStyle="#f2c9a0"; g.beginPath(); g.arc(128,100,50,0,7); g.fill(); g.fillStyle="#3a6ee8"; g.fillRect(78,150,100,106);
   try { await aiImage(await loadImg(c.toDataURL()), cfg()); $("#setMsg").innerHTML = `<div class="ok">연결 성공! AI 변환을 쓸 수 있어요.</div>`; }
   catch(e){ $("#setMsg").innerHTML = `<div class="warn">연결 실패: ${esc(e.message)}</div>`; }
+};
+// 키 옮기기: 주소 # 뒤(#key=…)는 서버로 전송되지 않음. 받은 키는 두 앱이 함께 쓰는 baro.key에 저장
+(() => { const m = location.hash.match(/[#&]key=([^&]+)/); if (!m) return;
+  store.set("baro.key", decodeURIComponent(m[1])); history.replaceState(null, "", location.pathname + location.search);
+  setTimeout(() => toast("AI 키가 이 기기에 저장됐어요 (두 앱 모두)", 4000), 300); })();
+$("#bQR").onclick = async () => {
+  saveSet(); const k = cfg().key; if (!k) return toast("먼저 API 키를 넣어 주세요");
+  if (location.protocol !== "https:") return toast("인터넷 주소(https)로 연 앱에서만 쓸 수 있어요");
+  if (!window.QRCode) await new Promise((ok,no) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); }).catch(()=>{});
+  if (!window.QRCode) return toast("QR을 만들 수 없어요. 인터넷 연결을 확인해 주세요");
+  $("#qr").innerHTML = ""; new QRCode($("#qr"), {text: location.href.split("#")[0] + "#key=" + encodeURIComponent(k), width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M});
+  $("#qrBox").style.display = "block";
 };
 $("#bHelp").onclick = () => $("#mHelp").classList.add("on");
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click", ev=>{ if (ev.target===m || ev.target.hasAttribute("data-close")) { if (m.id==="mCam") closeCam(); else m.classList.remove("on"); } }));
