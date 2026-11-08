@@ -219,11 +219,16 @@ const FRAMES = {
   black:{name:"클래식 블랙", bg:"#111111", fg:"#ffffff", sub:"#b5b5b5", r:0},
   white:{name:"화이트", bg:"#ffffff", fg:"#111111", sub:"#8a8a8a", r:.5, border:"#dddddd"},
   pink:{name:"ICON 핑크", bg:"#F9D5DC", fg:"#C23A5A", sub:"#cf6f86", r:.8, deco:"heart"},
-  film:{name:"필름", bg:"#1b1b1b", fg:"#F3D46B", sub:"#a9a9a9", r:0, deco:"film"}
+  film:{name:"필름", bg:"#1b1b1b", fg:"#F3D46B", sub:"#a9a9a9", r:0, deco:"film"},
+  mudeung:{name:"광주 · 서석대", pat:"hex", bg:"#3F5B4C", fg:"#ffffff", sub:"#D3E3D7", r:.6, plate:"#2B4236e8", slot:"#2B4236"},
+  melon:{name:"광주 · 무등산 수박", pat:"melon", bg:"#3E8E3A", fg:"#ffffff", sub:"#FFE3E7", r:.6, plate:"#E8475B", seeds:true, slot:"#1F5A2E"},
+  ginkgo:{name:"광주 · 은행잎", pat:"ginkgo", bg:"#FFF6DA", fg:"#5A3E00", sub:"#9A7420", r:.6, plate:"#ffffffee", slot:"#F3E6BF"},
+  snow:{name:"겨울 눈꽃", pat:"snow", bg:"#1B2A4A", fg:"#ffffff", sub:"#BFD8F5", r:.6, plate:"#1B2A4Ae0", slot:"#24385E"}
 };
 const DEF_PROMPT = {
-  roblox: "Transform the person or people in this photo into 3D blocky game avatars in the style of Roblox: cube-shaped heads with simple friendly cartoon faces, blocky torsos and limbs, smooth plastic toy-like look, bright soft studio lighting. Keep the same number of people in the same positions and poses, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns and any items they hold, so each person stays recognizable. Keep the camera framing of the original photo and turn the background into a clean, colorful 3D game-world version of the same place. No text, no logos, no watermark."
+  roblox: "Recreate this entire photo as a fully 3D-rendered scene from the game Roblox. Convert EVERYTHING in the image, not just the faces. (1) Every person becomes a complete Roblox avatar from head to toe: a blocky Roblox head with a simple classic Roblox cartoon face, a rectangular blocky torso, and straight blocky arms and legs with a smooth plastic toy material. No realistic skin, hands, necks or human body proportions may remain. (2) Their real clothes become Roblox shirt and pants textures with the same colors and patterns, and their hairstyle, hair color, glasses, hats and held items become matching Roblox accessories, so each person is still recognizable. (3) The whole background and every object (walls, floor, windows, doors, desks, chairs, trees, sky) is rebuilt from smooth Roblox Studio blocks and simple low-poly parts with bright plastic materials, keeping the same layout and colors as the original place. Keep the same number of people, their left-to-right positions and poses, and the same camera framing. Bright soft game lighting. Nothing in the image should look like a real photograph. No text, no logos, no game UI, no watermark."
 };
+const OLD_PROMPTS = ["Transform the person or people in this photo into 3D blocky game avatars in the style of Roblox: cube-shaped heads with simple friendly cartoon faces, blocky torsos and limbs, smooth plastic toy-like look, bright soft studio lighting. Keep the same number of people in the same positions and poses, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns and any items they hold, so each person stays recognizable. Keep the camera framing of the original photo and turn the background into a clean, colorful 3D game-world version of the same place. No text, no logos, no watermark."];   // 예전 기본 프롬프트가 저장된 기기는 새 기본값으로 바꿔 씀
 const DEF_MODEL = {gemini:"gemini-2.5-flash-image", openai:"gpt-image-1"};
 
 const S = {
@@ -317,6 +322,64 @@ $("#bShoot4").onclick = async () => {
   $("#cd").textContent = ""; shooting = false; closeCam(); toast("4컷 촬영 완료!");
 };
 
+// ---------- 광주 시그니처·겨울 패턴 (u = 1mm에 해당하는 픽셀) ----------
+function rng(seed){ return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function plateRect(g, x, y, w, h, r, col){ g.fillStyle = col; g.beginPath(); g.roundRect ? g.roundRect(x,y,w,h,r) : g.rect(x,y,w,h); g.fill(); }
+function ginkgoLeaf(g, x, y, r, rot, col, u){
+  g.save(); g.translate(x,y); g.rotate(rot); g.fillStyle = col; g.strokeStyle = col; g.lineWidth = Math.max(1,.3*u); g.lineCap = "round";
+  for (const [a,b] of [[-1.05,-.06],[.06,1.05]]){ g.beginPath(); g.moveTo(0,0); g.arc(0,0,r,-Math.PI/2+a,-Math.PI/2+b); g.closePath(); g.fill(); }
+  g.beginPath(); g.moveTo(0,0); g.lineTo(r*.1,r*.6); g.stroke(); g.restore();
+}
+function snowflake(g, x, y, r, rot, col, u){
+  g.save(); g.translate(x,y); g.rotate(rot); g.strokeStyle = col; g.lineWidth = Math.max(1,.3*u); g.lineCap = "round";
+  for (let k=0;k<6;k++){ g.rotate(Math.PI/3); g.beginPath(); g.moveTo(0,0); g.lineTo(0,-r);
+    for (const [p,q] of [[.55,.26],[.3,.17]]){ g.moveTo(0,-r*p); g.lineTo(-r*q,-r*(p+q)); g.moveTo(0,-r*p); g.lineTo(r*q,-r*(p+q)); }
+    g.stroke(); }
+  g.restore();
+}
+function drawPattern(g, kind, x, y, w, h, u){
+  g.save(); g.beginPath(); g.rect(x,y,w,h); g.clip(); const R = rng(11);
+  if (kind === "hex"){            // 무등산 서석대 주상절리(육각 돌기둥 단면) + 무등산 능선
+    g.fillStyle = "#3F5B4C"; g.fillRect(x,y,w,h);
+    const r = 3.4*u, hw = Math.sqrt(3)*r, cols = ["#4A6857","#55735F","#45614F","#5F7D68"];
+    g.lineWidth = Math.max(1,.3*u); g.strokeStyle = "#8FAA98";
+    for (let row=0, cy=y-r; cy<y+h+r; row++, cy+=1.5*r)
+      for (let cx=x-hw+(row%2?hw/2:0); cx<x+w+hw; cx+=hw){
+        g.beginPath(); for (let k=0;k<6;k++){ const a = Math.PI/6+k*Math.PI/3; g.lineTo(cx+r*.94*Math.cos(a), cy+r*.94*Math.sin(a)); } g.closePath();
+        g.fillStyle = cols[Math.floor(R()*cols.length)]; g.fill(); g.stroke(); }
+    g.fillStyle = "#2B4236"; g.beginPath(); g.moveTo(x,y+h); const base = y+h-Math.min(w,h)*.05;
+    for (let i=0;i<=60;i++){ const t = i/60, top = Math.pow(Math.sin(Math.PI*t),.7)*Math.min(w,h)*.13 + (Math.abs(t-.5)<.09 ? Math.cos((t-.5)*35)*Math.min(w,h)*.012 : 0); g.lineTo(x+w*t, base-top); }
+    g.lineTo(x+w,y+h); g.closePath(); g.fill();
+  } else if (kind === "melon"){   // 무등산 수박 껍질 줄무늬
+    g.fillStyle = "#3E8E3A"; g.fillRect(x,y,w,h); g.fillStyle = "#123F1A";
+    for (let sx=x-2*u; sx<x+w+4*u; sx+=6.5*u){
+      const pts = []; for (let yy=y-2*u; yy<=y+h+2.2*u; yy+=2.2*u) pts.push([sx+(R()-.5)*2.2*u, yy]);
+      g.beginPath(); pts.forEach(([px,py],i)=>i?g.lineTo(px,py):g.moveTo(px,py));
+      for (let i=pts.length-1;i>=0;i--) g.lineTo(pts[i][0]+2.4*u+(R()-.5)*1.2*u, pts[i][1]); g.closePath(); g.fill(); }
+  } else if (kind === "ginkgo"){  // 광주 시목 은행나무 잎
+    g.fillStyle = "#FFF6DA"; g.fillRect(x,y,w,h); const st = 7*u;
+    for (let row=0, yy=y-st/2; yy<y+h+st; row++, yy+=st*.86)
+      for (let xx=x-st/2+(row%2?st/2:0); xx<x+w+st; xx+=st)
+        ginkgoLeaf(g, xx+(R()-.5)*2*u, yy+(R()-.5)*2*u, (2.6+R()*1.2)*u, R()*Math.PI*2, R()<.5?"#F5B700":"#E89A00", u);
+  } else if (kind === "snow"){    // 겨울 눈꽃
+    const gr = g.createLinearGradient(x,y,x,y+h); gr.addColorStop(0,"#1B2A4A"); gr.addColorStop(1,"#3A5C96"); g.fillStyle = gr; g.fillRect(x,y,w,h);
+    g.fillStyle = "#ffffff66"; const n = Math.round(w*h/(u*u)/7);
+    for (let i=0;i<n;i++){ g.beginPath(); g.arc(x+R()*w, y+R()*h, (.15+R()*.3)*u, 0, 7); g.fill(); }
+    const st = 9*u;
+    for (let row=0, yy=y; yy<y+h+st; row++, yy+=st*.8)
+      for (let xx=x+(row%2?st/2:0); xx<x+w+st; xx+=st)
+        snowflake(g, xx+(R()-.5)*3*u, yy+(R()-.5)*3*u, (1.5+R()*1.8)*u, R()*.5, R()<.3?"#BFE3FF":"#ffffff", u);
+  }
+  g.restore();
+}
+// 프레임 고르기 칸의 미리보기 무늬
+const swCache = {};
+function patSwatch(kind){
+  if (swCache[kind]) return swCache[kind];
+  const c = document.createElement("canvas"); c.width = 200; c.height = 120; drawPattern(c.getContext("2d"), kind, 0, 0, 200, 120, 3.4);
+  const url = c.toDataURL(); free(c); return swCache[kind] = url;
+}
+
 // ---------- 프레임·레이아웃 ----------
 function layout(W, H){
   const s = W/55, out = {photos:[], foot:[], cut:null};
@@ -354,6 +417,7 @@ function render(canvas=$("#cv"), preview=true){
     const cols = L.cut ? [0, L.cut] : [0]; const bw = L.cut ? L.cut : W;
     for (const ox of cols) for (let y=px*2; y<H-px*2; y+=px*3.2){ rr(g, ox+px*.55, y, px*1.1, px*1.7, px*.3); g.fill(); rr(g, ox+bw-px*1.65, y, px*1.1, px*1.7, px*.3); g.fill(); }
   }
+  if (F.pat) drawPattern(g, F.pat, 0, 0, W, H, px);
   L.photos.forEach(r=>{
     g.save(); rr(g, r.x, r.y, r.w, r.h, px*F.r); g.clip();
     const p = photoOf(r.slot);
@@ -366,7 +430,7 @@ function render(canvas=$("#cv"), preview=true){
         g.fillText(p.ai.status==="busy" ? "AI 변환 중…" : p.ai.status==="error" ? "변환 실패" : "AI 변환 전", r.x+r.w/2, r.y+r.h/2);
       }
     } else {
-      g.fillStyle = S.frame==="black"||S.frame==="film" ? "#2b2b2b" : "#e9e9ec"; g.fillRect(r.x,r.y,r.w,r.h);
+      g.fillStyle = F.slot || (S.frame==="black"||S.frame==="film" ? "#2b2b2b" : "#e9e9ec"); g.fillRect(r.x,r.y,r.w,r.h);
       g.fillStyle = "#999"; g.textAlign="center"; g.textBaseline="middle"; g.font = `700 ${px*4}px Pretendard, "Malgun Gothic"`;
       g.fillText(r.slot+1, r.x+r.w/2, r.y+r.h/2);
     }
@@ -375,6 +439,8 @@ function render(canvas=$("#cv"), preview=true){
   });
   L.foot.forEach(f=>{
     const cx = f.x+f.w/2; g.textAlign="center"; g.textBaseline="middle";
+    if (F.plate){ const m = px*1.6, py = f.y+f.h*.1, ph = f.h*.8; plateRect(g, f.x+m, py, f.w-2*m, ph, px*2, F.plate);
+      if (F.seeds){ g.fillStyle = "#2A0B10"; for (let sx=f.x+m+px*3; sx<f.x+f.w-m-px*2; sx+=px*4.2){ g.beginPath(); g.ellipse(sx, py+ph*.13, px*.3, px*.5, .3, 0, 7); g.fill(); } } }
     g.fillStyle = F.fg; fitText(g, $("#tTitle").value, f.w*.86, f.h*.34, 800); g.fillText($("#tTitle").value, cx, f.y+f.h*.42);
     g.fillStyle = F.sub; fitText(g, $("#tSub").value, f.w*.88, f.h*.15, 500); g.fillText($("#tSub").value, cx, f.y+f.h*.74);
     if (F.deco === "heart" && !L.cut){ g.fillStyle = F.fg; const hs=f.h*.16; heart(g, f.x+f.w*.09, f.y+f.h*.3, hs); heart(g, f.x+f.w*.91, f.y+f.h*.3, hs); }
@@ -387,7 +453,7 @@ function drawFrames(){
   const box = $("#frames"); box.innerHTML = "";
   for (const [k,F] of Object.entries(FRAMES)){
     const d = document.createElement("div"); d.className = "fr" + (S.frame===k?" on":"");
-    d.innerHTML = `<div class="sw" style="background:${F.bg};border:1px solid ${F.border||F.bg}"><i></i><i></i><i></i><i></i></div>${F.name}`;
+    d.innerHTML = `<div class="sw" style="background:${F.pat?`url(${patSwatch(F.pat)}) center/cover`:F.bg};border:1px solid ${F.border||F.bg}"><i></i><i></i><i></i><i></i></div>${F.name}`;
     d.onclick = () => { S.frame = k; drawFrames(); render(); }; box.appendChild(d);
   }
 }
@@ -440,7 +506,7 @@ function syncTools(){
 
 // ---------- AI ----------
 const cfg = () => ({prov: store.get("icon.prov","gemini"), key: sessionKey || store.get("icon.key",""),
-  model: store.get("icon.model."+store.get("icon.prov","gemini"), DEF_MODEL[store.get("icon.prov","gemini")]), prompt: store.get("icon.prompt", DEF_PROMPT.roblox)});
+  model: store.get("icon.model."+store.get("icon.prov","gemini"), DEF_MODEL[store.get("icon.prov","gemini")]), prompt: (p => OLD_PROMPTS.includes(p) ? DEF_PROMPT.roblox : p)(store.get("icon.prompt", DEF_PROMPT.roblox))});
 let sessionKey = "";
 function toB64(img, max=1024){
   const s = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight)), c = document.createElement("canvas");
