@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ICON 인생네컷 스튜디오</title>
+<style>
+:root{--pink:#ED6D80;--ink:#1d1d1f;--sub:#6b6b70;--line:#e4e4e8;--bg:#f6f6f8;--card:#fff;--green:#14532D}
+*{box-sizing:border-box}
+body{margin:0;font-family:Pretendard,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#111;color:#fff;position:sticky;top:0;z-index:5}
+header h1{font-size:19px;margin:0;letter-spacing:-.3px}
+header h1 b{color:var(--pink)}
+header .sp{flex:1}
+header .cnt{font-size:13px;color:#bbb}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;cursor:pointer;color:var(--ink)}
+button:hover{border-color:#bbb}
+button.pri{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:700}
+button.dark{background:#111;border-color:#111;color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+header button{background:#2a2a2a;border-color:#2a2a2a;color:#fff}
+main{display:grid;grid-template-columns:400px 1fr;gap:18px;padding:18px;max-width:1400px;margin:auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.panel h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.panel h2 .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tray{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.tray .th{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;background:#eee}
+.tray .th img{width:100%;height:100%;object-fit:cover;display:block}
+.tray .th .badge{position:absolute;left:4px;top:4px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:1px 5px}
+.tray .th .x{position:absolute;right:3px;top:3px;width:20px;height:20px;padding:0;border-radius:50%;font-size:12px;line-height:18px;background:#000a;color:#fff;border:0}
+.tray .th .ai{position:absolute;right:4px;bottom:4px;background:#111c;color:#fff;font-size:10px;border-radius:5px;padding:1px 4px}
+.empty{color:var(--sub);font-size:13px;padding:6px 0}
+.frames{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fr{border:2px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;text-align:center;font-size:12px;background:#fff}
+.fr.on{border-color:var(--pink)}
+.fr .sw{height:54px;border-radius:6px;margin-bottom:5px;display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px 4px 12px}
+.fr .sw i{background:#ccc;border-radius:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:8px 12px}
+.seg button.on{background:#111;color:#fff}
+label.f{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px}
+input[type=text],input[type=password],select,textarea{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+textarea{min-height:120px;font-size:13px}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px;position:sticky;top:72px}
+#cv{height:min(72vh,760px);width:auto;max-width:100%;box-shadow:0 10px 30px #0002;border-radius:4px;touch-action:none;background:#fff}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--sub)}
+.tools input[type=range]{width:140px}
+.note{font-size:12px;color:var(--sub);line-height:1.55}
+.warn{font-size:12px;color:#b3261e;background:#fdecea;border-radius:8px;padding:8px 10px;margin-top:8px}
+.ok{font-size:12px;color:#14532D;background:#e8f3ec;border-radius:8px;padding:8px 10px;margin-top:8px}
+.big{font-size:17px;padding:13px 18px;width:100%}
+.modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:20;padding:16px}
+.modal.on{display:grid}
+.box{background:#fff;border-radius:18px;padding:20px;width:min(560px,100%);max-height:92vh;overflow:auto}
+.box h3{margin:0 0 6px}
+.cam{background:#000;border-radius:18px;padding:14px;width:min(900px,100%);text-align:center;color:#fff;position:relative}
+.cam video{width:100%;border-radius:10px;background:#222;max-height:70vh}
+.cam .cd{position:absolute;inset:0;display:grid;place-items:center;font-size:160px;font-weight:900;pointer-events:none;text-shadow:0 4px 30px #000}
+.cam .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s;border-radius:18px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;z-index:30;display:none;max-width:90vw}
+.fi{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+button,.th,.fr{touch-action:manipulation}
+#saveImg{max-width:100%;max-height:62vh;display:block;margin:12px auto;border-radius:6px;box-shadow:0 4px 16px #0003;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
+@media (pointer:coarse){textarea{font-size:16px}}
+@media (max-width:600px){header{flex-wrap:wrap;padding:10px 12px;gap:8px}header h1{font-size:16px}header button{padding:7px 10px;font-size:13px}main{padding:10px}.seg button{padding:8px 9px;font-size:14px}}
+@media (max-width:900px){main{grid-template-columns:1fr}.stage{position:static}#cv{height:auto;width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <h1><b>ICON</b> 인생네컷 스튜디오</h1>
+  <span class="sp"></span>
+  <span class="cnt" id="cnt"></span>
+  <button id="bHelp">사용법</button>
+  <button id="bSet">⚙ AI 설정</button>
+  <button id="bReset">↺ 다음 참여자</button>
+</header>
+
+<main>
+<section>
+  <div class="panel">
+    <h2><span class="n">1</span>사진 고르기</h2>
+    <div class="row">
+      <button class="pri" id="bCam">📷 4컷 촬영</button>
+      <button id="bLoad">🖼 사진 불러오기</button>
+      <button id="bAuto">자동 채우기</button>
+      <input type="file" id="fLoad" accept="image/*" multiple class="fi">
+      <input type="file" id="fCap" accept="image/*" capture="user" class="fi">
+    </div>
+    <div class="tray" id="tray"></div>
+    <div class="empty" id="trayEmpty">현장에서 찍은 사진을 불러오거나 바로 촬영하세요. 사진을 누르면 선택된 칸에 들어가요.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="n">2</span>프레임 고르기</h2>
+    <div class="frames" id="frames"></div>
+    <label class="f">레이아웃</label>
+    <div class="seg" id="segLayout">
+      <button data-v="grid" class="on">2×2 그리드</button>
+      <button data-v="strip">스트립 2장 (반 잘라 나눔)</button>
+    </div>
+    <label class="f">프레임 문구</label>
+    <input type="text" id="tTitle" value="ICON 인생네컷" maxlength="20">
+    <label class="f">아래 작은 글씨</label>
+    <input type="text" id="tSub" value="2026.11.14 · 서석중 동아리 발표회" maxlength="40">
+  </div>
+
+  <div class="panel">
+    <h2><span class="n">3</span>기본형 / AI 캐릭터형</h2>
+    <div class="seg" id="segMode">
+      <button data-v="basic" class="on">기본형 (원본 사진)</button>
+      <button data-v="ai">AI 캐릭터형</button>
+    </div>
+    <div id="aiBox" style="display:none;margin-top:10px">
+      <label class="row" style="font-size:13px;gap:6px"><input type="checkbox" id="cConsent"> 참여자에게 AI 변환 안내·동의를 받았어요 (원본은 체험 후 삭제)</label>
+      <div class="row" style="margin-top:10px">
+        <button class="dark" id="bAI">✨ 4컷을 로블록스 캐릭터로 변환</button>
+      </div>
+      <div class="note" id="aiStat" style="margin-top:8px">칸을 선택한 뒤 아래 [이 칸만 다시 변환]으로 한 장씩 다시 만들 수도 있어요.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="n">4</span>저장 · 인쇄</h2>
+    <label class="f">인쇄 크기</label>
+    <select id="sSize"></select>
+    <div class="row" id="customSize" style="display:none;margin-top:6px">
+      <input type="text" id="cw" placeholder="가로 mm" style="width:45%"> × <input type="text" id="ch" placeholder="세로 mm" style="width:45%">
+    </div>
+    <div style="margin-top:12px"><button class="pri big" id="bSave">⬇ JPG 다운로드</button></div>
+    <div class="note" style="margin-top:8px">320dpi 고화질 JPG로 저장돼요. 샤오미 포토프린터 앱에서 이 파일을 열어 [채우기/원본 크기]로 인쇄하세요. 스트립 2장은 가운데 점선을 따라 자르면 두 명이 한 장씩 가져갈 수 있어요.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <canvas id="cv"></canvas>
+  <div class="tools">
+    <span id="selInfo">칸을 눌러 선택 · 드래그로 위치 조정</span>
+    <label>확대 <input type="range" id="rZoom" min="1" max="3" step="0.01" value="1"></label>
+    <button id="bClear">이 칸 비우기</button>
+    <button id="bRedo" style="display:none">이 칸만 다시 변환</button>
+  </div>
+</section>
+</main>
+
+<div class="modal" id="mCam">
+  <div class="cam">
+    <video id="vid" autoplay playsinline muted></video>
+    <div class="cd" id="cd"></div>
+    <div class="flash" id="flash"></div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="pri" id="bShoot4">● 4컷 연속 촬영 (3초 간격)</button>
+      <button id="bShoot1">1장 찍기</button>
+      <label style="font-size:13px;color:#ddd"><input type="checkbox" id="cMirror" checked> 거울 모드</label>
+      <button id="bCamClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mSet">
+  <div class="box">
+    <h3>AI 캐릭터 변환 설정</h3>
+    <p class="note">사진을 AI 이미지 서비스로 보내 캐릭터로 바꿔요. API 키는 이 기기 브라우저에만 저장되고 다른 곳으로 보내지 않아요.</p>
+    <label class="f">AI 서비스</label>
+    <select id="sProv">
+      <option value="gemini">Google Gemini (나노바나나 · 장당 약 50~60원)</option>
+      <option value="openai">OpenAI 이미지 (장당 약 60~250원)</option>
+    </select>
+    <label class="f">API 키</label>
+    <input type="password" id="tKey" placeholder="여기에 붙여넣기" autocomplete="off">
+    <label class="row" style="font-size:13px;gap:6px;margin-top:6px"><input type="checkbox" id="cSaveKey" checked> 이 기기에 키 기억하기</label>
+    <label class="f">모델 이름</label>
+    <input type="text" id="tModel">
+    <label class="f">변환 스타일 (프롬프트)</label>
+    <textarea id="tPrompt"></textarea>
+    <div class="row" style="margin-top:12px;justify-content:space-between">
+      <button id="bPromptReset">프롬프트 기본값</button>
+      <div class="row"><button id="bTest">연결 테스트</button><button class="pri" id="bSetOk">저장</button></div>
+    </div>
+    <div id="setMsg"></div>
+  </div>
+</div>
+
+<div class="modal" id="mHelp">
+  <div class="box">
+    <h3>부스 운영 순서</h3>
+    <ol class="note" style="font-size:14px;padding-left:18px">
+      <li><b>사진</b> — [4컷 촬영]으로 포토존에서 바로 찍거나, 폰으로 찍은 사진을 [사진 불러오기]로 여러 장 넣어요. 사진을 누르면 선택된 칸(분홍 테두리)에 들어가요.</li>
+      <li><b>프레임</b> — 4가지 중 하나를 고르고, 그리드/스트립을 정해요. 칸을 드래그하면 사진 위치, 확대 막대로 크기를 맞출 수 있어요.</li>
+      <li><b>AI 캐릭터형</b> — 동의 체크 후 [로블록스 캐릭터로 변환]. 4장 변환에 30초~1분 걸려요. 마음에 안 드는 칸은 [이 칸만 다시 변환].</li>
+      <li><b>저장</b> — [JPG 다운로드] → 샤오미 포토프린터 앱으로 인쇄.</li>
+      <li><b>다음 참여자</b> — 사진·변환 결과를 모두 지워요(원본 삭제 약속).</li>
+    </ol>
+    <p class="note">폰·태블릿은 <b>사파리(또는 크롬)에서 https 주소</b>로 여세요. 카톡·파일 앱으로 html 파일을 열면 작동하지 않아요. API 키는 기기마다 한 번씩 넣어야 해요.</p>
+    <div class="row" style="justify-content:flex-end"><button class="pri" data-close>확인</button></div>
+  </div>
+</div>
+<div class="modal" id="mSave">
+  <div class="box" style="text-align:center">
+    <h3>사진 앱에 저장하기</h3>
+    <p class="note" style="font-size:14px">아래 이미지를 <b>길게 누른 뒤 [사진 앱에 저장]</b>을 누르세요.<br>그다음 포토프린터 앱에서 인쇄하면 돼요.</p>
+    <img id="saveImg" alt="저장할 이미지">
+    <div class="row" style="justify-content:center"><button class="pri" id="bShare" style="display:none">공유 · 사진에 저장</button><button data-close>닫기</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const MM = 25.4, DPI = 320;
+const SIZES = [
+  {k:"pc", name:"포토카드 55×85mm (기본 · 포토카드 케이스용)", w:55, h:85},
+  {k:"x23", name:"샤오미 휴대용 1S · 2×3인치 (50.8×76.2mm)", w:50.8, h:76.2},
+  {k:"46", name:"4×6인치 인화지 (101.6×152.4mm)", w:101.6, h:152.4},
+  {k:"custom", name:"직접 입력 (mm)", w:55, h:85}
+];
+const FRAMES = {
+  black:{name:"클래식 블랙", bg:"#111111", fg:"#ffffff", sub:"#b5b5b5", r:0},
+  white:{name:"화이트", bg:"#ffffff", fg:"#111111", sub:"#8a8a8a", r:.5, border:"#dddddd"},
+  pink:{name:"ICON 핑크", bg:"#F9D5DC", fg:"#C23A5A", sub:"#cf6f86", r:.8, deco:"heart"},
+  film:{name:"필름", bg:"#1b1b1b", fg:"#F3D46B", sub:"#a9a9a9", r:0, deco:"film"}
+};
+const DEF_PROMPT = {
+  roblox: "Transform the person or people in this photo into 3D blocky game avatars in the style of Roblox: cube-shaped heads with simple friendly cartoon faces, blocky torsos and limbs, smooth plastic toy-like look, bright soft studio lighting. Keep the same number of people in the same positions and poses, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns and any items they hold, so each person stays recognizable. Keep the camera framing of the original photo and turn the background into a clean, colorful 3D game-world version of the same place. No text, no logos, no watermark."
+};
+const DEF_MODEL = {gemini:"gemini-2.5-flash-image", openai:"gpt-image-1"};
+
+const S = {
+  photos: [], slots: [null,null,null,null], xf: [0,1,2,3].map(()=>({z:1,x:.5,y:.5})),
+  sel: 0, frame: "black", layout: "grid", mode: "basic", size: SIZES[0]
+};
+let uid = 0;
+const store = { get(k,d){ try{ const v = localStorage.getItem(k); return v===null?d:v }catch(e){ return d } },
+                set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} } };
+function toast(m, ms=2600){ const t=$("#toast"); t.textContent=m; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none", ms); }
+
+// ---------- 사진 ----------
+function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=src; }); }
+async function shrink(img, max=2000){
+  const s = Math.min(1, max/Math.max(img.naturalWidth, img.naturalHeight));
+  if (s === 1) return img;
+  const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth*s); c.height = Math.round(img.naturalHeight*s);
+  c.getContext("2d").drawImage(img,0,0,c.width,c.height); const u = c.toDataURL("image/jpeg",.92); free(c); return loadImg(u);
+}
+// iOS 사파리는 캔버스 메모리 한도가 작아서, 다 쓴 캔버스는 바로 비운다
+function free(...cs){ cs.forEach(c=>{ c.width = c.height = 0; }); }
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+async function addPhoto(src){
+  const img = await shrink(await loadImg(src));
+  const p = {id: ++uid, img, ai:{status:"idle"}}; S.photos.push(p); return p;
+}
+async function addFiles(files){
+  for (const f of files){
+    const url = URL.createObjectURL(f);
+    try { await addPhoto(url); } catch(e){ toast("사진을 열 수 없어요: " + f.name); }
+  }
+  drawTray(); render();
+}
+function assign(pid){
+  let i = S.slots[S.sel] == null ? S.sel : S.slots.indexOf(null);
+  if (i < 0) i = S.sel;
+  S.slots[i] = pid; S.xf[i] = {z:1,x:.5,y:.5};
+  const nx = S.slots.indexOf(null); if (nx >= 0) S.sel = nx;
+  drawTray(); render(); syncTools();
+}
+function drawTray(){
+  const t = $("#tray"); t.innerHTML = "";
+  $("#trayEmpty").style.display = S.photos.length ? "none" : "block";
+  S.photos.forEach(p=>{
+    const d = document.createElement("div"); d.className = "th";
+    const im = (S.mode==="ai" && p.ai.status==="done") ? p.ai.img : p.img;
+    d.innerHTML = `<img src="${im.src}">`;
+    const used = S.slots.map((v,i)=>v===p.id?i+1:0).filter(Boolean);
+    if (used.length) d.insertAdjacentHTML("beforeend", `<span class="badge">${used.join(",")}</span>`);
+    if (p.ai.status==="done") d.insertAdjacentHTML("beforeend", `<span class="ai">AI</span>`);
+    if (p.ai.status==="busy") d.insertAdjacentHTML("beforeend", `<span class="ai">변환 중</span>`);
+    const x = document.createElement("button"); x.className="x"; x.textContent="✕";
+    x.onclick = e => { e.stopPropagation(); S.photos = S.photos.filter(q=>q!==p); S.slots = S.slots.map(v=>v===p.id?null:v); drawTray(); render(); };
+    d.appendChild(x); d.onclick = () => assign(p.id); t.appendChild(d);
+  });
+}
+$("#bLoad").onclick = () => $("#fLoad").click();
+$("#fLoad").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
+$("#fCap").onchange = async e => { await addFiles([...e.target.files]); const p = S.photos[S.photos.length-1]; if (p) assign(p.id); e.target.value = ""; };
+$("#bAuto").onclick = () => {
+  const ids = S.photos.slice(-4).map(p=>p.id); if (!ids.length) return toast("먼저 사진을 넣어 주세요");
+  S.slots = [0,1,2,3].map(i=>ids[i % ids.length]); S.xf = S.slots.map(()=>({z:1,x:.5,y:.5})); drawTray(); render();
+};
+
+// ---------- 카메라 ----------
+let stream = null;
+$("#bCam").onclick = async () => {
+  if (!(navigator.mediaDevices && window.isSecureContext)) return $("#fCap").click();   // 폰(http 접속) → 기본 카메라 앱
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1920},height:{ideal:1080}}, audio:false});
+    $("#vid").srcObject = stream; $("#mCam").classList.add("on"); mirror();
+  } catch(e){ $("#fCap").click(); }
+};
+function mirror(){ $("#vid").style.transform = $("#cMirror").checked ? "scaleX(-1)" : ""; }
+$("#cMirror").onchange = mirror;
+function closeCam(){ $("#mCam").classList.remove("on"); if (stream) stream.getTracks().forEach(t=>t.stop()); stream = null; }
+$("#bCamClose").onclick = closeCam;
+async function snap(){
+  const v = $("#vid"), c = document.createElement("canvas"); c.width = v.videoWidth; c.height = v.videoHeight;
+  const g = c.getContext("2d"); if ($("#cMirror").checked){ g.translate(c.width,0); g.scale(-1,1); }
+  g.drawImage(v,0,0); const f = $("#flash"); f.style.opacity = 1; setTimeout(()=>f.style.opacity=0, 120);
+  const u = c.toDataURL("image/jpeg",.92); free(c); return addPhoto(u);
+}
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+async function countdown(n){ const cd=$("#cd"); for (let i=n;i>0;i--){ cd.textContent=i; await wait(1000); } cd.textContent=""; }
+let shooting = false;
+$("#bShoot1").onclick = async () => { if (shooting) return; shooting=true; await countdown(3); const p = await snap(); assign(p.id); shooting=false; };
+$("#bShoot4").onclick = async () => {
+  if (shooting) return; shooting = true; S.slots = [null,null,null,null]; S.sel = 0;
+  for (let k=0;k<4;k++){ $("#cd").textContent = ""; await countdown(3); const p = await snap(); assign(p.id); $("#cd").textContent = `${k+1}/4`; await wait(700); }
+  $("#cd").textContent = ""; shooting = false; closeCam(); toast("4컷 촬영 완료!");
+};
+
+// ---------- 프레임·레이아웃 ----------
+function layout(W, H){
+  const s = W/55, out = {photos:[], foot:[], cut:null};
+  if (S.layout === "grid"){
+    const m=3.4*s, top=3.6*s, g=1.8*s, foot=H*.15, cw=(W-2*m-g)/2, ch=(H-top-foot-g)/2;
+    for (let i=0;i<4;i++) out.photos.push({slot:i, x:m+(i%2)*(cw+g), y:top+Math.floor(i/2)*(ch+g), w:cw, h:ch});
+    const fy = top+2*ch+g; out.foot.push({x:0, y:fy, w:W, h:H-fy});
+  } else {
+    const half=W/2, m=2.3*s, top=2.8*s, g=1.3*s, foot=H*.12, cw=half-2*m, ch=(H-top-foot-3*g)/4;
+    for (let k=0;k<2;k++){
+      for (let i=0;i<4;i++) out.photos.push({slot:i, x:k*half+m, y:top+i*(ch+g), w:cw, h:ch});
+      const fy = top+4*ch+3*g; out.foot.push({x:k*half, y:fy, w:half, h:H-fy});
+    }
+    out.cut = half;
+  }
+  return out;
+}
+function rr(g,x,y,w,h,r){ g.beginPath(); g.roundRect ? g.roundRect(x,y,w,h,r) : g.rect(x,y,w,h); }
+function heart(g,x,y,sz){ g.beginPath(); g.moveTo(x,y+sz*.3); g.bezierCurveTo(x,y,x-sz*.5,y,x-sz*.5,y+sz*.3); g.bezierCurveTo(x-sz*.5,y+sz*.6,x,y+sz*.8,x,y+sz); g.bezierCurveTo(x,y+sz*.8,x+sz*.5,y+sz*.6,x+sz*.5,y+sz*.3); g.bezierCurveTo(x+sz*.5,y,x,y,x,y+sz*.3); g.fill(); }
+function fitText(g, t, maxW, size, weight){ let s=size; do { g.font = `${weight} ${s}px Pretendard, "Malgun Gothic", sans-serif`; s*=.94; } while (g.measureText(t).width > maxW && s > 6); }
+function photoOf(slot){ const id = S.slots[slot]; return S.photos.find(p=>p.id===id); }
+function drawCover(g, img, r, xf){
+  const iw = img.naturalWidth||img.width, ih = img.naturalHeight||img.height;
+  const sc = Math.max(r.w/iw, r.h/ih)*xf.z, dw = iw*sc, dh = ih*sc;
+  g.drawImage(img, r.x+(r.w-dw)*xf.x, r.y+(r.h-dh)*xf.y, dw, dh);
+}
+function render(canvas=$("#cv"), preview=true){
+  const W = Math.round(S.size.w/MM*DPI), H = Math.round(S.size.h/MM*DPI);
+  canvas.width = W; canvas.height = H;
+  const g = canvas.getContext("2d"), F = FRAMES[S.frame], L = layout(W,H), px = W/S.size.w;
+  g.fillStyle = F.bg; g.fillRect(0,0,W,H);
+  if (F.border){ g.strokeStyle = F.border; g.lineWidth = px*.3; g.strokeRect(px*.15,px*.15,W-px*.3,H-px*.3); }
+  if (F.deco === "film"){   // 필름 구멍
+    g.fillStyle = "#3a3a3a";
+    const cols = L.cut ? [0, L.cut] : [0]; const bw = L.cut ? L.cut : W;
+    for (const ox of cols) for (let y=px*2; y<H-px*2; y+=px*3.2){ rr(g, ox+px*.55, y, px*1.1, px*1.7, px*.3); g.fill(); rr(g, ox+bw-px*1.65, y, px*1.1, px*1.7, px*.3); g.fill(); }
+  }
+  L.photos.forEach(r=>{
+    g.save(); rr(g, r.x, r.y, r.w, r.h, px*F.r); g.clip();
+    const p = photoOf(r.slot);
+    if (p){
+      const useAI = S.mode==="ai" && p.ai.status==="done";
+      drawCover(g, useAI ? p.ai.img : p.img, r, S.xf[r.slot]);
+      if (preview && S.mode==="ai" && !useAI){
+        g.fillStyle = "#0008"; g.fillRect(r.x, r.y, r.w, r.h); g.fillStyle = "#fff"; g.textAlign="center"; g.textBaseline="middle";
+        fitText(g, p.ai.status==="busy" ? "AI 변환 중…" : p.ai.status==="error" ? "변환 실패" : "AI 변환 전", r.w*.8, px*3.2, 700);
+        g.fillText(p.ai.status==="busy" ? "AI 변환 중…" : p.ai.status==="error" ? "변환 실패" : "AI 변환 전", r.x+r.w/2, r.y+r.h/2);
+      }
+    } else {
+      g.fillStyle = S.frame==="black"||S.frame==="film" ? "#2b2b2b" : "#e9e9ec"; g.fillRect(r.x,r.y,r.w,r.h);
+      g.fillStyle = "#999"; g.textAlign="center"; g.textBaseline="middle"; g.font = `700 ${px*4}px Pretendard, "Malgun Gothic"`;
+      g.fillText(r.slot+1, r.x+r.w/2, r.y+r.h/2);
+    }
+    g.restore();
+    if (preview && r.slot===S.sel){ g.strokeStyle="#ED6D80"; g.lineWidth=px*.7; g.strokeRect(r.x,r.y,r.w,r.h); }
+  });
+  L.foot.forEach(f=>{
+    const cx = f.x+f.w/2; g.textAlign="center"; g.textBaseline="middle";
+    g.fillStyle = F.fg; fitText(g, $("#tTitle").value, f.w*.86, f.h*.34, 800); g.fillText($("#tTitle").value, cx, f.y+f.h*.42);
+    g.fillStyle = F.sub; fitText(g, $("#tSub").value, f.w*.88, f.h*.15, 500); g.fillText($("#tSub").value, cx, f.y+f.h*.74);
+    if (F.deco === "heart" && !L.cut){ g.fillStyle = F.fg; const hs=f.h*.16; heart(g, f.x+f.w*.09, f.y+f.h*.3, hs); heart(g, f.x+f.w*.91, f.y+f.h*.3, hs); }
+  });
+  if (L.cut && preview){ g.setLineDash([px*1.2,px*1]); g.strokeStyle = "#ED6D80"; g.lineWidth = px*.3; g.beginPath(); g.moveTo(L.cut,0); g.lineTo(L.cut,H); g.stroke(); g.setLineDash([]); }
+  if (L.cut && !preview){ g.fillStyle = F.sub; for (let y=0;y<H;y+=px*2){ g.fillRect(L.cut-px*.1, y, px*.2, px*.9); } }
+  return canvas;
+}
+function drawFrames(){
+  const box = $("#frames"); box.innerHTML = "";
+  for (const [k,F] of Object.entries(FRAMES)){
+    const d = document.createElement("div"); d.className = "fr" + (S.frame===k?" on":"");
+    d.innerHTML = `<div class="sw" style="background:${F.bg};border:1px solid ${F.border||F.bg}"><i></i><i></i><i></i><i></i></div>${F.name}`;
+    d.onclick = () => { S.frame = k; drawFrames(); render(); }; box.appendChild(d);
+  }
+}
+function seg(id, key, after){
+  document.querySelectorAll(id+" button").forEach(b=>b.onclick=()=>{
+    S[key] = b.dataset.v; document.querySelectorAll(id+" button").forEach(x=>x.classList.toggle("on", x===b)); after && after(); render();
+  });
+}
+seg("#segLayout","layout"); seg("#segMode","mode", ()=>{ $("#aiBox").style.display = S.mode==="ai"?"block":"none"; drawTray(); syncTools(); });
+["#tTitle","#tSub"].forEach(id=>$(id).oninput = () => render());
+SIZES.forEach(z=>$("#sSize").insertAdjacentHTML("beforeend", `<option value="${z.k}">${z.name}</option>`));
+$("#sSize").value = store.get("icon.size","pc");
+function applySize(){
+  const z = SIZES.find(x=>x.k===$("#sSize").value);
+  $("#customSize").style.display = z.k==="custom" ? "flex" : "none";
+  S.size = z.k==="custom" ? {w: parseFloat($("#cw").value)||55, h: parseFloat($("#ch").value)||85} : z;
+  store.set("icon.size", z.k); render();
+}
+$("#sSize").onchange = applySize; $("#cw").oninput = applySize; $("#ch").oninput = applySize;
+
+// ---------- 칸 선택·이동·확대 ----------
+function hit(e){
+  const c = $("#cv"), b = c.getBoundingClientRect(), x = (e.clientX-b.left)*c.width/b.width, y = (e.clientY-b.top)*c.height/b.height;
+  return layout(c.width,c.height).photos.find(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);
+}
+let drag = null;
+$("#cv").addEventListener("pointerdown", e=>{
+  const r = hit(e); if (!r) return; S.sel = r.slot; syncTools(); render();
+  const p = photoOf(r.slot); if (!p) return;
+  drag = {r, x:e.clientX, y:e.clientY, xf:{...S.xf[r.slot]}}; $("#cv").setPointerCapture(e.pointerId);
+});
+$("#cv").addEventListener("pointermove", e=>{
+  if (!drag) return; const c=$("#cv"), b=c.getBoundingClientRect(), k=c.width/b.width;
+  const p = photoOf(drag.r.slot), img = (S.mode==="ai"&&p.ai.status==="done")?p.ai.img:p.img;
+  const sc = Math.max(drag.r.w/img.naturalWidth, drag.r.h/img.naturalHeight)*drag.xf.z;
+  const ox = img.naturalWidth*sc - drag.r.w, oy = img.naturalHeight*sc - drag.r.h;
+  const xf = S.xf[drag.r.slot];
+  xf.x = ox>0 ? Math.min(1,Math.max(0, drag.xf.x - (e.clientX-drag.x)*k/ox)) : .5;
+  xf.y = oy>0 ? Math.min(1,Math.max(0, drag.xf.y - (e.clientY-drag.y)*k/oy)) : .5;
+  render();
+});
+$("#cv").addEventListener("pointerup", ()=>drag=null);
+$("#cv").addEventListener("wheel", e=>{ const r=hit(e); if(!r||!photoOf(r.slot)) return; e.preventDefault(); S.sel=r.slot; const xf=S.xf[r.slot]; xf.z=Math.min(3,Math.max(1,xf.z*(e.deltaY<0?1.06:.94))); syncTools(); render(); }, {passive:false});
+$("#rZoom").oninput = e => { S.xf[S.sel].z = +e.target.value; render(); };
+$("#bClear").onclick = () => { S.slots[S.sel] = null; drawTray(); render(); };
+function syncTools(){
+  $("#rZoom").value = S.xf[S.sel].z; $("#selInfo").textContent = `${S.sel+1}번 칸 선택 · 드래그로 위치 조정`;
+  $("#bRedo").style.display = S.mode==="ai" && photoOf(S.sel) ? "inline-block" : "none";
+}
+
+// ---------- AI ----------
+const cfg = () => ({prov: store.get("icon.prov","gemini"), key: sessionKey || store.get("icon.key",""),
+  model: store.get("icon.model."+store.get("icon.prov","gemini"), DEF_MODEL[store.get("icon.prov","gemini")]), prompt: store.get("icon.prompt", DEF_PROMPT.roblox)});
+let sessionKey = "";
+function toB64(img, max=1024){
+  const s = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight)), c = document.createElement("canvas");
+  c.width = Math.round(img.naturalWidth*s); c.height = Math.round(img.naturalHeight*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+  const u = c.toDataURL("image/jpeg",.9).split(",")[1]; free(c); return u;
+}
+async function aiImage(img, C){
+  const b64 = toB64(img);
+  if (!C.key) throw new Error("API 키가 없어요. [⚙ AI 설정]에서 넣어 주세요.");
+  if (C.prov === "gemini"){
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(C.model)}:generateContent`, {
+      method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":C.key},
+      body: JSON.stringify({contents:[{parts:[{text:C.prompt},{inlineData:{mimeType:"image/jpeg",data:b64}}]}], generationConfig:{responseModalities:["TEXT","IMAGE"]}})
+    });
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok) throw new Error(j.error?.message || ("HTTP "+r.status));
+    const part = (j.candidates?.[0]?.content?.parts||[]).find(p=>p.inlineData||p.inline_data);
+    if (!part) throw new Error("이미지가 오지 않았어요 (안전 필터 또는 응답 오류). 다시 시도해 주세요.");
+    const d = part.inlineData || part.inline_data; return loadImg(`data:${d.mimeType||d.mime_type||"image/png"};base64,${d.data}`);
+  }
+  const fd = new FormData(), bin = Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
+  fd.append("model", C.model); fd.append("prompt", C.prompt); fd.append("size","1024x1536"); fd.append("quality","medium");
+  fd.append("image", new Blob([bin],{type:"image/jpeg"}), "photo.jpg");
+  const r = await fetch("https://api.openai.com/v1/images/edits", {method:"POST", headers:{Authorization:"Bearer "+C.key}, body:fd});
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(j.error?.message || ("HTTP "+r.status));
+  const d = j.data?.[0]; if (!d) throw new Error("이미지가 오지 않았어요.");
+  return loadImg(d.b64_json ? "data:image/png;base64,"+d.b64_json : d.url);
+}
+async function convert(p){
+  p.ai = {status:"busy"}; drawTray(); render();
+  try { p.ai = {status:"done", img: await aiImage(p.img, cfg())}; }
+  catch(e){ p.ai = {status:"error"}; toast("AI 변환 실패: " + e.message, 6000); }
+  drawTray(); render();
+}
+$("#bAI").onclick = async () => {
+  if (!$("#cConsent").checked) return toast("참여자 동의를 먼저 체크해 주세요");
+  const ps = [...new Set(S.slots.filter(v=>v!=null))].map(id=>S.photos.find(p=>p.id===id)).filter(p=>p.ai.status!=="done");
+  if (!ps.length) return toast(S.slots.some(v=>v!=null) ? "이미 모두 변환됐어요" : "먼저 4칸에 사진을 넣어 주세요");
+  $("#bAI").disabled = true; $("#aiStat").textContent = `${ps.length}장 변환 중… (장당 10~30초)`;
+  for (let i=0;i<ps.length;i+=2) await Promise.all(ps.slice(i,i+2).map(convert));   // 동시 2장
+  $("#bAI").disabled = false; const fail = ps.filter(p=>p.ai.status==="error").length;
+  $("#aiStat").textContent = fail ? `${fail}장 실패 — 칸을 눌러 [이 칸만 다시 변환]` : "변환 완료! 드래그로 위치를 맞추고 저장하세요.";
+};
+$("#bRedo").onclick = () => { if (!$("#cConsent").checked) return toast("참여자 동의를 먼저 체크해 주세요"); const p = photoOf(S.sel); if (p) convert(p); };
+
+// 설정 창
+function openSet(){
+  const C = cfg(); $("#sProv").value = C.prov; $("#tKey").value = C.key; $("#tModel").value = C.model; $("#tPrompt").value = C.prompt;
+  $("#cSaveKey").checked = store.get("icon.savekey","1")==="1"; $("#setMsg").innerHTML = ""; $("#mSet").classList.add("on");
+}
+$("#bSet").onclick = openSet;
+$("#sProv").onchange = () => { $("#tModel").value = store.get("icon.model."+$("#sProv").value, DEF_MODEL[$("#sProv").value]); };
+$("#bPromptReset").onclick = () => $("#tPrompt").value = DEF_PROMPT.roblox;
+function saveSet(){
+  const prov = $("#sProv").value; store.set("icon.prov", prov); store.set("icon.model."+prov, $("#tModel").value.trim()||DEF_MODEL[prov]);
+  store.set("icon.prompt", $("#tPrompt").value.trim()||DEF_PROMPT.roblox);
+  sessionKey = $("#tKey").value.trim(); store.set("icon.savekey", $("#cSaveKey").checked?"1":"0");
+  store.set("icon.key", $("#cSaveKey").checked ? sessionKey : "");
+}
+$("#bSetOk").onclick = () => { saveSet(); $("#mSet").classList.remove("on"); toast("저장했어요"); };
+$("#bTest").onclick = async () => {
+  saveSet(); $("#setMsg").innerHTML = `<div class="note" style="margin-top:8px">테스트 이미지로 변환해 보는 중… (약 10~30초, 1장 요금 발생)</div>`;
+  const c = document.createElement("canvas"); c.width=c.height=256; const g=c.getContext("2d");
+  g.fillStyle="#cfe8ff"; g.fillRect(0,0,256,256); g.fillStyle="#f2c9a0"; g.beginPath(); g.arc(128,100,50,0,7); g.fill(); g.fillStyle="#3a6ee8"; g.fillRect(78,150,100,106);
+  try { await aiImage(await loadImg(c.toDataURL()), cfg()); $("#setMsg").innerHTML = `<div class="ok">연결 성공! AI 변환을 쓸 수 있어요.</div>`; }
+  catch(e){ $("#setMsg").innerHTML = `<div class="warn">연결 실패: ${e.message.replace(/</g,"&lt;")}</div>`; }
+};
+
+// ---------- 저장 ----------
+async function jpegBlob(canvas){
+  const b = await new Promise(r=>canvas.toBlob(r,"image/jpeg",.95)); free(canvas); const a = new Uint8Array(await b.arrayBuffer());
+  if (a[2]===0xFF && a[3]===0xE0 && a[6]===0x4A){ a[13]=1; a[14]=DPI>>8; a[15]=DPI&255; a[16]=DPI>>8; a[17]=DPI&255; }   // JFIF 해상도 320dpi
+  return new Blob([a], {type:"image/jpeg"});
+}
+$("#bSave").onclick = async () => {
+  if (S.slots.every(v=>v==null)) return toast("사진을 먼저 넣어 주세요");
+  if (S.mode==="ai" && S.slots.some(v=>v!=null && S.photos.find(p=>p.id===v).ai.status!=="done") && !confirm("AI 변환이 안 된 칸이 있어요. 그대로 저장할까요?")) return;
+  const blob = await jpegBlob(render(document.createElement("canvas"), false));
+  const t = new Date(), stamp = [t.getHours(),t.getMinutes(),t.getSeconds()].map(v=>String(v).padStart(2,"0")).join("");
+  dl(blob, `ICON네컷_${S.mode==="ai"?"AI":"기본"}_${stamp}.jpg`);
+  const k = "icon.count." + t.toISOString().slice(0,10); store.set(k, +store.get(k,0)+1); showCount(); if (!IOS) toast("저장 완료! 포토프린터 앱에서 인쇄하세요");
+};
+// PC·안드로이드: 바로 다운로드 / 아이폰·아이패드: 이미지를 띄워 길게 눌러 '사진 앱에 저장'(https면 공유 버튼도)
+function dl(blob, name){
+  if (!IOS){ const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); return; }
+  const f = new File([blob], name, {type: blob.type}), canShare = !!(navigator.canShare && navigator.canShare({files:[f]}));
+  $("#bShare").style.display = canShare ? "" : "none"; $("#bShare").onclick = () => navigator.share({files:[f]}).catch(()=>{});
+  const r = new FileReader(); r.onload = () => { $("#saveImg").src = r.result; $("#mSave").classList.add("on"); }; r.readAsDataURL(blob);
+}
+function showCount(){ const k = "icon.count." + new Date().toISOString().slice(0,10); $("#cnt").textContent = `오늘 출력 ${store.get(k,0)}장`; }
+
+// ---------- 초기화 ----------
+$("#bReset").onclick = () => {
+  if (S.photos.length && !confirm("사진과 AI 변환 결과를 모두 지우고 다음 참여자를 받을까요?")) return;
+  S.photos = []; S.slots = [null,null,null,null]; S.xf = S.slots.map(()=>({z:1,x:.5,y:.5})); S.sel = 0; $("#cConsent").checked = false;
+  drawTray(); render(); syncTools(); toast("초기화했어요. 다음 참여자를 받아 주세요!");
+};
+$("#bHelp").onclick = () => $("#mHelp").classList.add("on");
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click", e=>{ if (e.target===m || e.target.hasAttribute("data-close")) { if (m.id==="mCam") closeCam(); else m.classList.remove("on"); } }));
+
+drawFrames(); applySize(); drawTray(); syncTools(); showCount();
+</script>
+</body>
+</html>
