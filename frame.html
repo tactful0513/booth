@@ -152,6 +152,7 @@ button,.th,.qi{touch-action:manipulation}
     <div class="cd" id="cd"></div>
     <div class="row" style="justify-content:center;margin-top:12px">
       <button class="pri" id="bShoot">● 3초 뒤 촬영</button>
+      <button id="bFlip">↻ 전면/후면 전환</button>
       <label style="font-size:13px;color:#ddd"><input type="checkbox" id="cMirror" checked> 거울 모드</label>
       <button id="bCamClose">닫기</button>
     </div>
@@ -254,10 +255,25 @@ $("#bLoad").onclick = () => $("#fLoad").click();
 $("#fLoad").onchange = e => { const f = e.target.files[0]; if (f) setDraft(URL.createObjectURL(f)); e.target.value=""; };
 $("#fCap").onchange = e => { const f = e.target.files[0]; if (f) setDraft(URL.createObjectURL(f)); e.target.value=""; };
 let stream = null;
+let facing = "user";                                  // user = 전면, environment = 후면 (마지막 선택 기억)
+try { facing = localStorage.getItem("frame.facing") || "user"; } catch(e){}
+async function startCam(){
+  if (stream) stream.getTracks().forEach(t=>t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing}, width:{ideal:1920}, height:{ideal:1080}}, audio:false});
+  $("#vid").srcObject = stream;
+  $("#cMirror").checked = facing === "user"; mirror();  // 전면은 거울 모드, 후면은 그대로
+}
 $("#bCam").onclick = async () => {
+  $("#fCap").setAttribute("capture", facing);
   if (!(navigator.mediaDevices && window.isSecureContext)) return $("#fCap").click();
-  try { stream = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1920},height:{ideal:1080}},audio:false});
-        $("#vid").srcObject = stream; $("#mCam").classList.add("on"); mirror(); } catch(e){ $("#fCap").click(); }
+  try { await startCam(); $("#mCam").classList.add("on"); } catch(e){ $("#fCap").click(); }
+};
+$("#bFlip").onclick = async () => {
+  if ($("#cd").textContent) return;                   // 카운트다운 중에는 전환 금지
+  facing = facing === "user" ? "environment" : "user";
+  try { localStorage.setItem("frame.facing", facing); } catch(e){}
+  try { await startCam(); toast(facing === "user" ? "전면 카메라" : "후면 카메라"); }
+  catch(e){ toast("이 기기에서는 카메라를 바꿀 수 없어요"); }
 };
 function mirror(){ $("#vid").style.transform = $("#cMirror").checked ? "scaleX(-1)" : ""; }
 $("#cMirror").onchange = mirror;
