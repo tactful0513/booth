@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-title" content="7초 게임">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>7초 스탑워치 게임</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:#f4f5f7;color:#111;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#111;color:#fff;flex-wrap:wrap}
+header h1{font-size:18px;margin:0;flex:1}
+header a{color:#fff;text-decoration:none;background:#2a2a2a;border-radius:10px;padding:9px 12px;font-size:14px;white-space:nowrap}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;text-align:center}
+.goal{font-size:clamp(18px,4vw,26px);font-weight:700;color:#555}
+.goal b{color:#FF6B35}
+#t{font-size:clamp(96px,26vw,260px);font-weight:800;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-2px}
+#msg{font-size:clamp(20px,5vw,34px);font-weight:700;min-height:1.3em}
+#go{width:min(520px,88vw);padding:clamp(22px,5vw,36px) 0;border:0;border-radius:24px;font-size:clamp(34px,8vw,60px);font-weight:800;color:#fff;background:#14532D;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#go.run{background:#C0392B}
+#again{padding:14px 30px;border:2px solid #111;border-radius:14px;background:#fff;font-size:20px;font-weight:700;cursor:pointer;display:none}
+#best{font-size:15px;color:#6b6b70}
+.win #t{color:#FF6B35}
+</style></head>
+<body>
+<header>
+  <a href="index.html">⌂ 처음</a>
+  <h1>⏱ 7초 스탑워치 게임</h1>
+  <a href="icon.html">↔ 서석중</a>
+  <a href="frame.html">↔ 전남고</a>
+</header>
+<main id="m">
+  <div class="goal"><b>7.00초</b>에 딱 맞춰 STOP!</div>
+  <div id="t">0.00</div>
+  <div id="msg"></div>
+  <button id="go">START</button>
+  <button id="again">↺ 다시 시도</button>
+  <div id="best"></div>
+</main>
+<script>
+const $ = s => document.querySelector(s), GOAL = 7;
+let t0 = 0, raf = 0, state = "ready";   // ready → run → done
+const fmt = s => s.toFixed(2);
+function tick(){ $("#t").textContent = fmt((performance.now()-t0)/1000); raf = requestAnimationFrame(tick); }
+function reset(){ state = "ready"; $("#t").textContent = "0.00"; $("#msg").textContent = ""; $("#go").textContent = "START";
+  $("#go").className = ""; $("#go").style.display = ""; $("#again").style.display = "none"; $("#m").classList.remove("win"); }
+function press(){
+  if (state === "ready"){ state = "run"; t0 = performance.now(); $("#go").textContent = "STOP"; $("#go").className = "run"; tick(); return; }
+  if (state !== "run") return;
+  cancelAnimationFrame(raf); state = "done";
+  const t = Math.round((performance.now()-t0)/10)/100, d = Math.abs(t-GOAL);   // 화면에 보이는 0.01초 단위로 판정
+  $("#t").textContent = fmt(t);
+  $("#msg").textContent = d < 0.005 ? "🎉 완벽! 정확히 7.00초!" : d <= 0.05 ? `아깝다! ${fmt(d)}초 차이` : d <= 0.3 ? `${fmt(d)}초 차이 — 조금만 더!` : `${fmt(d)}초 차이 — 다시 도전!`;
+  $("#m").classList.toggle("win", d < 0.005);
+  $("#go").style.display = "none"; $("#again").style.display = "inline-block";
+  let b = null; try { b = localStorage.getItem("sw7.best"); } catch(e){}
+  if (b === null || d < +b){ b = d; try { localStorage.setItem("sw7.best", d); } catch(e){} }
+  showBest(b);
+}
+function showBest(b){ $("#best").textContent = b === null ? "" : `이 기기 최고 기록: 7초와 ${fmt(+b)}초 차이`; }
+$("#go").addEventListener("pointerdown", ev => { ev.preventDefault(); press(); });   // click보다 빠른 반응
+$("#again").onclick = reset;
+document.addEventListener("keydown", ev => { if (ev.code === "Space" || ev.code === "Enter"){ ev.preventDefault(); state === "done" ? reset() : press(); } });
+try { showBest(localStorage.getItem("sw7.best")); } catch(e){}
+</script>
+</body></html>
