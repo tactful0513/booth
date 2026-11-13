@@ -96,6 +96,8 @@ button,.th,.qi{touch-action:manipulation}
       <input type="file" id="fCap" accept="image/*" capture="user" class="fi">
     </div>
     <div class="pv" id="pv" style="display:none"><img id="pvImg"><span class="note">여러 명이 함께 찍어도 왼쪽부터 순서대로 캐릭터가 돼요.</span></div>
+    <label class="f">캐릭터 스타일</label>
+    <div class="themes" id="styles"></div>
     <label class="row" style="font-size:13px;gap:6px;margin-top:12px"><input type="checkbox" id="cConsent"> AI 변환 안내·동의를 받았어요</label>
     <label class="row" style="font-size:13px;gap:6px;margin-top:6px"><input type="checkbox" id="cDel" checked> 변환이 끝나면 원본 사진 자동 삭제</label>
     <div class="row" style="margin-top:12px">
@@ -162,7 +164,7 @@ button,.th,.qi{touch-action:manipulation}
 <div class="modal" id="mSet">
   <div class="box">
     <h3>AI 캐릭터 변환 설정</h3>
-    <p class="note">사진을 AI 이미지 서비스로 보내 싸이월드 미니미 스타일로 바꿔요. API 키는 이 기기 브라우저에만 저장돼요.</p>
+    <p class="note">사진을 AI 이미지 서비스로 보내 고른 스타일(미니미·피규어·RPG·격투게임)의 캐릭터로 바꿔요. API 키는 이 기기 브라우저에만 저장돼요.</p>
     <label class="f">AI 서비스</label>
     <select id="sProv">
       <option value="gemini">Google Gemini (나노바나나 · 장당 약 50~60원)</option>
@@ -173,7 +175,7 @@ button,.th,.qi{touch-action:manipulation}
     <label class="row" style="font-size:13px;gap:6px;margin-top:6px"><input type="checkbox" id="cSaveKey" checked> 이 기기에 키 기억하기</label>
     <label class="f">모델 이름</label>
     <input type="text" id="tModel">
-    <label class="f">변환 스타일 (프롬프트)</label>
+    <label class="f">미니미 스타일 프롬프트 (다른 스타일은 고정)</label>
     <textarea id="tPrompt"></textarea>
     <div class="row" style="margin-top:12px;justify-content:space-between">
       <button id="bPromptReset">프롬프트 기본값</button>
@@ -230,6 +232,16 @@ const THEMES = {
   snow:{label:"겨울 눈꽃", pat:"snow", bg:"#1B2A4A", panel:"#ffffff", plate:"#ffffffeb", head:"#35548A", name:"#1B2A4A", acc:"#5AA9E6", sub:"#6A86B0"}
 };
 const DEF_PROMPT = "Convert the person or people in this photo into Cyworld minimi style pixel-art characters: cute chibi proportions (big head, small body, about 2 heads tall), clean 16-bit pixel art with crisp dark outlines, simple dot eyes and rosy pink cheeks. Keep the same number of people in the same left-to-right order, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns, and any items they hold, so each person is recognizable. Full body, standing, front view, centered. Plain pure white background, no shadow, no text, no frame, no border.";
+const KEEP = " Keep the same number of people in the same left-to-right order, and keep each person's hairstyle, hair color, glasses, clothing colors and patterns, and any items they hold, so each person is recognizable.";
+const STYLES = {   // prompt:null → 설정의 미니미 프롬프트 사용
+  minimi: {label:"싸이월드 미니미", ico:"🙂", prompt:null},
+  figure: {label:"액션 피규어", ico:"📦", prompt:"Turn the person or people in this photo into collectible plastic action figures sealed inside a toy package: glossy toy-plastic look with slightly stylized proportions, each figure standing in a cardboard-backed box with a clear plastic window, plus two or three small accessory items in separate compartments that match what the person wears or holds." + KEEP + " It must clearly look like a toy, not a photograph of a real person. Front view of the whole box, centered. The header strip of the box is plain color with no letters, no text and no logos. Plain pure white background outside the box, no shadow."},
+  rpg:    {label:"RPG 게임 캐릭터", ico:"⚔️", prompt:"Convert the person or people in this photo into fantasy RPG game hero characters: clean anime game illustration style with cel shading and bold outlines, heroic confident pose, light fantasy armor or adventurer outfit that keeps the person's clothing colors, holding a fitting weapon or magic item." + KEEP + " Full body, front view, centered. Plain pure white background, no shadow, no text, no game UI, no frame, no border."},
+  arcade: {label:"격투게임 도트", ico:"🕹️", prompt:"Convert the person or people in this photo into retro 1990s arcade fighting game character sprites: detailed 16-bit pixel art, about five heads tall, dynamic fighting stance with fists up, crisp dark outlines and a limited color palette." + KEEP + " Full body, centered. Plain pure white background, no shadow, no text, no health bar, no frame, no border."}
+};
+const STAT_KEYS = ["힘","민첩","지능","매력"];   // 항목은 모두 같고 수치만 랜덤 → 친구끼리 비교
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+function rollStats(){ return {lv: rnd(1,99), v: STAT_KEYS.map(()=>rnd(10,99))}; }
 const DEF_MODEL = {gemini:"gemini-2.5-flash-image", openai:"gpt-image-1"};
 const PFONT = 'Galmuri11, "Galmuri9", Pretendard, "Malgun Gothic", sans-serif';
 
@@ -292,7 +304,8 @@ $("#bAdd").onclick = () => {
   if (!name) return toast("이름을 먼저 써 주세요");
   if (!S.draft) return toast("사진을 먼저 찍거나 불러와 주세요");
   if (!$("#cConsent").checked) return toast("AI 변환 동의를 먼저 체크해 주세요");
-  const e = {id: ++uid, no: nextNo(), name, line: $("#tLine").value.trim(), photo: S.draft, char: null, kind: null, status: "wait", xf: {z:1,x:0,y:0}};
+  const e = {id: ++uid, no: nextNo(), name, line: $("#tLine").value.trim(), photo: S.draft, char: null, kind: null, status: "wait", xf: {z:1,x:0,y:0},
+             style: S.style, stats: S.style === "rpg" ? rollStats() : null};
   S.list.push(e); S.sel = e.id; S.draft = null; $("#pv").style.display = "none";
   $("#tName").value = ""; $("#tLine").value = ""; $("#cConsent").checked = false;
   drawQueue(); render(); convert(e);
@@ -304,7 +317,7 @@ function drawQueue(){
   S.list.forEach(e=>{
     const d = document.createElement("div"); d.className = "qi" + (e.id===S.sel?" on":"");
     const im = e.char || e.photo;
-    d.innerHTML = `${im?`<img src="${im.src}">`:`<div class="ph"></div>`}<div class="sp"><div class="nm">${esc(e.name)} <span class="note">No.${String(e.no).padStart(3,"0")}</span></div><span class="st ${e.status}">${lab[e.status]}</span></div>`;
+    d.innerHTML = `${im?`<img src="${im.src}">`:`<div class="ph"></div>`}<div class="sp"><div class="nm">${esc(e.name)} <span class="note">No.${String(e.no).padStart(3,"0")} · ${STYLES[e.style].ico}</span></div><span class="st ${e.status}">${lab[e.status]}</span></div>`;
     const btns = document.createElement("div"); btns.className = "row"; btns.style.flexDirection = "column"; btns.style.gap = "4px";
     if (e.photo && e.status!=="busy"){ const b = mk("다시", ()=>convert(e)); btns.appendChild(b); const p = mk("픽셀 필터", ()=>pixelate(e)); btns.appendChild(p); }
     btns.appendChild(mk("삭제", ()=>{ if (confirm(e.name+" 님을 명단에서 지울까요?")){ S.list = S.list.filter(x=>x!==e); if (S.sel===e.id) S.sel = S.list[0]?.id ?? null; drawQueue(); render(); } }));
@@ -352,7 +365,8 @@ async function convert(e){
   if (!e.photo) return toast("원본 사진이 삭제돼서 다시 변환할 수 없어요. 다시 촬영해 주세요.");
   e.status = "busy"; drawQueue(); render();
   try {
-    e.char = await trimWhite(await aiImage(e.photo, cfg())); e.kind = "ai"; e.status = "done"; e.xf = {z:1,x:0,y:0};
+    const C = cfg(), sp = STYLES[e.style].prompt; if (sp) C.prompt = sp;
+    e.char = await trimWhite(await aiImage(e.photo, C)); e.kind = "ai"; e.status = "done"; e.xf = {z:1,x:0,y:0};
     if ($("#cDel").checked) e.photo = null;          // 동의서 약속: 원본 삭제
     toast(`${e.name} 님 캐릭터 완성!`);
   } catch(err){ e.status = "err"; toast(`${e.name} 님 변환 실패: ${err.message}`, 6000); }
@@ -457,7 +471,8 @@ function render(canvas=$("#cv"), preview=true){
   g.textAlign = "right"; fit(g, "No.000", W*.2, 2.4*s, PFONT); g.fillText(e ? "No."+String(e.no).padStart(3,"0") : "No.000", W-4*s-3.4*s, 5.2*s);
   pixHeart(g, W-4*s-2.8*s, 4.1*s, .4*s, T.acc);
   // 캐릭터 영역
-  const A = area(W,H);
+  const A0 = area(W,H), SB = e?.stats ? 10.5*s : 0, A = {...A0, h: A0.h - SB};   // RPG 스탯창 자리만큼 캐릭터 영역 축소
+  if (SB) drawStats(g, e.stats, {x:A0.x, y:A.y+A.h, w:A0.w, h:SB}, s, T);
   if (T.panel){ g.fillStyle = T.panel; g.beginPath(); g.roundRect ? g.roundRect(A.x,A.y,A.w,A.h,2*s) : g.rect(A.x,A.y,A.w,A.h); g.fill();
     g.save(); g.clip(); g.strokeStyle = "#eef1f5"; g.lineWidth = Math.max(1,s*.12);
     for (let x=A.x;x<A.x+A.w;x+=2.5*s){ g.beginPath(); g.moveTo(x,A.y); g.lineTo(x,A.y+A.h); g.stroke(); }
@@ -475,7 +490,7 @@ function render(canvas=$("#cv"), preview=true){
   }
   g.restore();
   // 이름·소개·바닥글
-  const rest = A.y + A.h, line = e?.line || "";
+  const rest = A0.y + A0.h, line = e?.line || "";
   if (T.plate) plateRect(g, 4*s, rest+1.6*s, W-8*s, H-rest-3.2*s, 2*s, T.plate);
   g.textAlign = "center"; g.fillStyle = T.name;
   const nm = e ? e.name : "이름";
@@ -488,6 +503,28 @@ function render(canvas=$("#cv"), preview=true){
     g.strokeStyle = "#1e88e566"; g.strokeRect(mm*2.5, mm*2.5, W-mm*5, H-mm*5); g.setLineDash([]);
   }
   return canvas;
+}
+// RPG 스탯창: LV·직업 + 4개 능력치 막대 (랜덤)
+function drawStats(g, st, B, s, T){
+  g.save(); g.fillStyle = "#1b1f2a"; g.beginPath(); g.roundRect ? g.roundRect(B.x, B.y+.6*s, B.w, B.h-.6*s, 1.4*s) : g.rect(B.x, B.y+.6*s, B.w, B.h-.6*s); g.fill();
+  g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#f3d46b";
+  fit(g, `LV.${st.lv}`, B.w*.45, 2.2*s, PFONT); g.fillText(`LV.${st.lv}`, B.x+1.6*s, B.y+2.6*s);
+  const sum = `총합 ${st.v.reduce((a,b)=>a+b,0)}`; g.textAlign = "right"; g.fillText(sum, B.x+B.w-1.6*s, B.y+2.6*s); g.textAlign = "left";
+  const cw = (B.w-3.2*s)/2;
+  st.v.forEach((v,i) => {
+    const x = B.x+1.6*s + (i%2)*cw, y = B.y+5.3*s + Math.floor(i/2)*3*s, lw = 5*s, bw = cw-lw-6.4*s;
+    g.fillStyle = "#ffffff"; g.font = `${1.8*s}px ${PFONT}`; g.fillText(STAT_KEYS[i], x, y);
+    g.fillStyle = "#3a4050"; g.fillRect(x+lw, y-.7*s, bw, 1.4*s);
+    g.fillStyle = v >= 90 ? "#ff6b35" : (T.acc || "#5aa9e6"); g.fillRect(x+lw, y-.7*s, bw*v/99, 1.4*s);
+    g.fillStyle = "#ffffff"; g.fillText(String(v), x+lw+bw+.8*s, y);
+  });
+  g.restore();
+}
+function drawStyles(){
+  const box = $("#styles"); box.innerHTML = "";
+  Object.entries(STYLES).forEach(([k,v]) => { const d = document.createElement("div"); d.className = "th" + (k===S.style?" on":"");
+    d.innerHTML = `<div style="font-size:24px;line-height:34px">${v.ico}</div>${v.label}`;
+    d.onclick = () => { S.style = k; store.set("frame.style",k); drawStyles(); }; box.appendChild(d); });
 }
 function drawThemes(){
   const box = $("#themes"); box.innerHTML = "";
@@ -576,6 +613,7 @@ document.querySelectorAll("a.nav").forEach(a => a.onclick = ev => { if (S.list.l
 $("#bHelp").onclick = () => $("#mHelp").classList.add("on");
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click", ev=>{ if (ev.target===m || ev.target.hasAttribute("data-close")) { if (m.id==="mCam") closeCam(); else m.classList.remove("on"); } }));
 
+S.style = store.get("frame.style","minimi"); if (!STYLES[S.style]) S.style = "minimi"; drawStyles();
 S.theme = store.get("frame.theme","grid"); drawThemes(); applySize(); drawQueue();
 document.fonts && document.fonts.load(`700 40px Galmuri11`).then(()=>render()).catch(()=>{});
 </script>
