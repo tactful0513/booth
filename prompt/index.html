@@ -239,10 +239,19 @@ footer .send{flex:1;background:var(--org)}
   <button class="btn ghost" id="next">▶</button>
 </div></footer>
 <div class="toast" id="toast"></div>
+<div id="codeBox" style="display:none;position:fixed;inset:0;background:rgba(10,20,50,.55);z-index:30;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:20px;padding:24px;max-width:420px;width:100%;text-align:center">
+    <div style="font-size:40px">🔑</div>
+    <h3 style="margin:6px 0 4px;font-size:22px">수업 코드를 입력하세요</h3>
+    <p class="hint" style="margin:0 0 14px">선생님이 칠판이나 화면에 적어 준 코드예요</p>
+    <input type="text" id="codeIn" placeholder="예) 광덕고2-3" style="text-align:center;font-size:20px;font-weight:700">
+    <button class="btn" id="codeOk" style="width:100%;margin-top:12px;padding:14px">시작하기</button>
+  </div>
+</div>
 
 <script>
 // ---------- 설정: 수업 코드(?c=)와 시트 주소(#api=)는 선생님 화면 QR에 들어 있음 ----------
-const DEFAULT_API = "";
+const DEFAULT_API = "https://script.google.com/macros/s/AKfycbxyReqZUc3o6bZoR0HqrM5BaeHFM8tyLjgIRcJSzu1ym12ITjPUBRYZzrvZ74H0n75w/exec";
 const Q = new URLSearchParams(location.search);
 const H = new URLSearchParams(location.hash.slice(1));
 const ls = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
@@ -253,7 +262,15 @@ if (H.get("api")) { ls.set("pq_api", H.get("api")); history.replaceState(null, "
 const CLASS = ls.get("pq_class") || "기본";
 const API = ls.get("pq_api") || DEFAULT_API;
 const KEY = "pq_state_" + CLASS;
-document.getElementById("code").textContent = "수업 " + CLASS;
+document.getElementById("code").textContent = "수업 " + CLASS + " ✎";
+// 교안 QR(수업 코드 없이 들어온 경우): 이 탭에서 처음 열 때 수업 코드를 묻는다
+const ss = { get(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} } };
+function askCode(){ const b = document.getElementById("codeBox"), i = document.getElementById("codeIn"); i.value = ls.get("pq_class") || ""; b.style.display = "flex"; setTimeout(() => i.focus(), 50); }
+document.getElementById("codeOk").onclick = () => { const v = document.getElementById("codeIn").value.trim(); if (!v) return; ls.set("pq_class", v); ss.set("pq_ok", "1"); location.href = location.pathname; };
+document.getElementById("codeIn").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("codeOk").click(); });
+document.getElementById("code").style.cursor = "pointer";
+document.getElementById("code").onclick = askCode;
+if (Q.get("c")) ss.set("pq_ok", "1"); else if (!ss.get("pq_ok")) askCode();
 
 const blank = () => ({ info:{}, score:["","","","",""], rev:{}, card:{}, lv:{sent:["","","","",""], sum:["","","","",""], star:[0,0,0,0,0], best:""}, hunt:{ox:["","","","",""], fix:["","","","",""], chk:[false,false,false,false,false]}, fin:{} });
 let S = blank();

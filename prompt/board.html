@@ -132,6 +132,7 @@ input[type=text]{width:100%;font:inherit;font-size:16px;border:1.5px solid var(-
   <h2>학생 입장 QR</h2>
   <div class="qrw"><div id="qr"></div>
     <div style="flex:1;min-width:260px"><p style="font-size:24px;font-weight:800;margin:0 0 10px">휴대폰·태블릿 카메라로 찍어 들어오세요!</p>
+      <p style="font-size:20px;margin:0 0 10px">수업 코드 <b id="qrCode" style="font-size:34px;color:var(--b)"></b></p>
       <p class="hint">로그인 없이 바로 시작 · 쓴 내용은 기기에 자동 저장 · 다 쓰면 [선생님께 보내기]</p>
       <p style="word-break:break-all;font-size:13px;color:var(--gy)" id="link"></p>
       <button class="btn sm ghost" id="cpLink">링크 복사</button></div></div>
@@ -144,7 +145,7 @@ const ls = { get(k){ try { return localStorage.getItem(k); } catch(e){ return nu
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const Q = new URLSearchParams(location.search), DEMO = Q.has("demo");
-let API = ls.get("pqb_api") || "", CODE = Q.get("c") || ls.get("pqb_code") || "";
+let API = ls.get("pqb_api") || "https://script.google.com/macros/s/AKfycbxyReqZUc3o6bZoR0HqrM5BaeHFM8tyLjgIRcJSzu1ym12ITjPUBRYZzrvZ74H0n75w/exec", CODE = Q.get("c") || ls.get("pqb_code") || "";
 let ROWS = [];
 
 // ---------- 탭 · 모달 ----------
@@ -154,7 +155,7 @@ const open = id => $("#"+id).classList.add("on");
 
 // ---------- 설정 · QR ----------
 const studentURL = () => location.href.replace(/board\.html.*$/, "").replace(/[?#].*$/, "") + "index.html?c=" + encodeURIComponent(CODE) + "#api=" + encodeURIComponent(API);
-function showQR(){ if (!API || !CODE){ open("mSet"); return; } $("#qr").innerHTML = ""; new QRCode($("#qr"), { text: studentURL(), width: 340, height: 340, correctLevel: QRCode.CorrectLevel.M }); $("#link").textContent = studentURL(); open("mQr"); }
+function showQR(){ if (!API || !CODE){ open("mSet"); return; } $("#qr").innerHTML = ""; new QRCode($("#qr"), { text: studentURL(), width: 340, height: 340, correctLevel: QRCode.CorrectLevel.M }); $("#link").textContent = studentURL(); $("#qrCode").textContent = CODE; open("mQr"); }
 $("#qrBtn").onclick = showQR;
 $("#setBtn").onclick = () => { $("#iApi").value = API; $("#iCode").value = CODE; open("mSet"); };
 $("#saveSet").onclick = () => { const a = $("#iApi").value.trim(), c = $("#iCode").value.trim();
