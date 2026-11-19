@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>프롬프트 퀘스트 워크시트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--b:#1554CA;--bl:#F2F4FC;--blb:#4B66D8;--lb:#E8EFFF;--dk:#222;--gy:#7F7F7F;--line:#D9DEEA;--red:#C0392B;--grn:#16A085;--org:#E67E22;--pur:#8E44AD;--bg:#F7F7F7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dk);font-family:Pretendard,'Malgun Gothic',sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:980px;margin:0 auto}
+.top h1{font-size:18px;margin:0;font-weight:800;color:var(--b)}
+.top .code{font-size:12px;background:var(--lb);color:var(--b);padding:3px 8px;border-radius:99px;font-weight:700}
+.top .st{margin-left:auto;font-size:12px;color:var(--gy)}
+nav{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;max-width:980px;margin:0 auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;border:1.5px solid var(--line);background:#fff;color:var(--dk);border-radius:99px;padding:8px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+nav button.on{background:var(--b);border-color:var(--b);color:#fff}
+nav button .ok{color:#2ECC71;margin-left:4px}
+main{max-width:980px;margin:0 auto;padding:18px 16px 110px}
+section{display:none}section.on{display:block}
+.sec{font-size:13px;color:var(--b);font-weight:700;margin:0 0 4px}
+h2{font-size:24px;margin:0 0 6px;font-weight:800;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--b);flex:none}
+.lead{color:var(--gy);margin:0 0 16px;line-height:1.5}
+hr.t{border:0;border-top:1px solid #cfcfcf;margin:0 0 18px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card.blue{background:var(--bl);border-color:var(--blb)}
+.chip{display:inline-block;background:var(--b);color:#fff;border-radius:8px;padding:5px 12px;font-weight:700;font-size:14px}
+label.f{display:block;margin:12px 0 0}
+label.f>span{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.hint{font-size:13px;color:#9a9a9a;font-weight:400}
+input[type=text],input[type=number],textarea,select{width:100%;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--dk)}
+textarea{min-height:76px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--lb)}
+.row{display:grid;gap:10px}
+.r5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:640px){.r5{grid-template-columns:repeat(2,1fr)}}
+.btn{border:0;background:var(--b);color:#fff;font:inherit;font-weight:700;border-radius:10px;padding:10px 16px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--b);border:1.5px solid var(--b)}
+.btn.sm{padding:6px 12px;font-size:14px}
+.btn:active{transform:scale(.97)}
+.formula{font-size:20px;font-weight:800;text-align:center;line-height:1.6}
+.formula .a{color:var(--b)}.formula .o{color:var(--org)}
+.qcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:640px){.qcards{grid-template-columns:1fr 1fr}}
+.qc{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;text-align:left;font:inherit;color:var(--dk)}
+.qc b{display:flex;align-items:center;gap:8px;color:var(--b);font-size:14px;margin-bottom:6px}
+.qc i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--b);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.qc.hit{border-color:var(--org);box-shadow:0 0 0 3px #FDE3CF}
+.qc span{font-size:14px;font-weight:600;line-height:1.4}
+.score{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media(max-width:640px){.score{grid-template-columns:repeat(3,1fr)}}
+.score div{background:var(--bl);border:1.5px solid var(--blb);border-radius:12px;padding:8px;text-align:center}
+.score div b{display:block;font-size:13px}.score div small{display:block;color:var(--gy);font-size:11px;margin:2px 0 6px}
+.score input{text-align:center;padding:6px}
+.score .tot{background:var(--b);color:#fff;display:flex;flex-direction:column;justify-content:center}
+.score .tot strong{font-size:28px}
+img.mock{width:100%;border-radius:14px;border:1px solid var(--line);display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.el{display:grid;grid-template-columns:78px 1fr;gap:8px;align-items:start;margin-bottom:10px}
+.el .chip{text-align:center;padding:9px 0}
+.el small{display:block;color:var(--gy);font-size:12px;margin-bottom:4px}
+.draw{display:flex;flex-direction:column;gap:8px;align-items:center}
+canvas{width:240px;height:240px;background:#fff;border:1.5px dashed #bbb;border-radius:14px;touch-action:none}
+.pal{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pal button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px #ccc;cursor:pointer}
+.pal button.on{box-shadow:0 0 0 3px var(--dk)}
+.pal .tx{width:auto;border-radius:8px;padding:0 10px;background:#fff;font:inherit;font-size:13px}
+.out{background:#fff;border:1.5px solid var(--blb);border-radius:12px;padding:12px;line-height:1.6;white-space:pre-wrap;min-height:48px}
+.out.mute{color:#aaa}
+.lv{border-radius:16px;background:#fff;border:1.5px solid var(--line);margin-bottom:12px;overflow:hidden}
+.lv .hd{display:flex;align-items:center;gap:10px;padding:10px 14px;color:#fff;font-weight:800}
+.lv .hd small{font-weight:600;opacity:.9}
+.lv .bd{padding:12px 14px;display:grid;gap:10px}
+.stars{display:flex;gap:2px}
+.stars button{border:0;background:none;font-size:30px;line-height:1;color:#E6A700;cursor:pointer;padding:0 2px}
+.pick{display:flex;gap:8px;flex-wrap:wrap}
+.pick button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.pick button.on{background:var(--org);border-color:var(--org);color:#fff}
+.hunt{display:grid;grid-template-columns:34px 112px 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.hunt b{width:34px;height:34px;border-radius:50%;background:var(--b);color:#fff;display:flex;align-items:center;justify-content:center}
+.ox{display:flex;gap:6px}
+.ox button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 0;font:inherit;font-size:18px;font-weight:800;cursor:pointer;color:var(--gy)}
+.ox button.o.on{background:var(--grn);border-color:var(--grn);color:#fff}
+.ox button.x.on{background:var(--red);border-color:var(--red);color:#fff}
+.chk label{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--b)}
+.banner{background:var(--b);color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;text-align:center;line-height:1.5}
+.banner em{font-style:normal;color:#FFE08A}
+footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:10}
+footer .in{max-width:980px;margin:0 auto;display:flex;gap:8px}
+footer .send{flex:1;background:var(--org)}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:20;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.mt{margin-top:12px}.r{text-align:right}
+.brand{color:var(--b);font-weight:800;font-size:13px;text-align:right;margin-top:18px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>프롬프트 퀘스트</h1><span class="code" id="code"></span><span class="st" id="st">자동 저장됨</span></div>
+  <nav id="nav"></nav>
+</header>
+<main>
+
+<!-- 0. 시작 -->
+<section data-t="시작">
+  <p class="sec">프롬프트 퀘스트 워크시트</p>
+  <h2>시작하기</h2><hr class="t">
+  <div class="card">
+    <div class="row r5">
+      <label class="f"><span>학년</span><input type="number" inputmode="numeric" data-k="info.grade"></label>
+      <label class="f"><span>반</span><input type="number" inputmode="numeric" data-k="info.ban"></label>
+      <label class="f"><span>번호</span><input type="number" inputmode="numeric" data-k="info.num"></label>
+      <label class="f"><span>모둠</span><input type="text" data-k="info.team" placeholder="예) 1모둠"></label>
+      <label class="f"><span>이름 <span class="hint">(선택)</span></span><input type="text" data-k="info.name"></label>
+    </div>
+    <label class="f"><span>나의 관심 학과·직업</span><input type="text" data-k="info.interest" placeholder="예) 간호학과, 게임 기획자"></label>
+  </div>
+
+  <div class="card blue">
+    <span class="chip">오늘의 퀘스트 질문</span> <span class="hint">미션 ③ 시작 때 1분!</span>
+    <p class="formula"><span class="a">[관심 학과·직업]</span> + <span class="o">[진짜 궁금한 것 하나]</span> = 오늘의 Lv.1 질문</p>
+    <textarea data-k="info.quest" placeholder="예) 간호학과에 가려면 어떤 과목을 잘해야 할까?"></textarea>
+    <div class="mt" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="dice">🎲 주사위 굴리기</button><span class="hint">질문이 안 떠오르면 카드를 골라요. 단어는 내 관심 분야로 바꿔도 OK!</span>
+    </div>
+    <div class="qcards" id="qcards"></div>
+  </div>
+
+  <div class="card">
+    <b>모둠 퀘스트 점수판</b> <span class="hint">선생님이 불러 주는 점수를 적어요</span>
+    <div class="score mt" id="score"></div>
+  </div>
+</section>
+
+<!-- 1. 리버스 -->
+<section data-t="① 리버스">
+  <p class="sec">미션 ①</p>
+  <h2>프롬프트 리버스: 이 답을 만든 질문은?</h2><hr class="t">
+  <div class="two">
+    <img class="mock" src="img/reverse.webp" alt="질문이 가려진 AI 답변 화면">
+    <div>
+      <p class="lead">AI의 답을 보고 숨은 질문의 요소를 추리해 적어 보세요. (요소당 1점)</p>
+      <div id="rev"></div>
+    </div>
+  </div>
+  <div class="card mt">
+    <span class="chip">우리 모둠이 추리한 프롬프트</span>
+    <textarea class="mt" data-k="rev.prompt" placeholder="한 문단으로 이어서 써 보세요"></textarea>
+    <label class="f r"><span>맞힌 요소 (정답 공개 후)</span>
+      <select data-k="rev.hit" style="max-width:140px"><option value="">선택</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+  </div>
+</section>
+
+<!-- 2. 캐릭터 카드 -->
+<section data-t="② 캐릭터 카드">
+  <p class="sec">미션 ②</p>
+  <h2>나만의 AI 비서 캐릭터 카드</h2><hr class="t">
+  <div class="card" style="border-color:var(--b);border-width:2.5px;padding:0;overflow:hidden">
+    <div style="background:var(--b);color:#fff;text-align:center;font-weight:800;padding:10px;letter-spacing:1px">MY AI ASSISTANT CARD</div>
+    <div class="two" style="padding:16px">
+      <div class="draw">
+        <canvas id="cv" width="480" height="480"></canvas>
+        <div class="pal" id="pal"></div>
+        <label class="f" style="width:240px"><span style="text-align:center">비서 이름</span><input type="text" data-k="card.name" placeholder="예) 포폴메이트 '디자니'"></label>
+      </div>
+      <div id="cardf"></div>
+    </div>
+  </div>
+  <div class="card blue">
+    <b>카드 = 프롬프트!</b> <span class="hint">5칸을 이어 붙이면 나만의 AI 비서 프롬프트가 돼요</span>
+    <div class="out mt" id="cardOut"></div>
+    <div class="mt r"><button class="btn sm" data-copy="cardOut">📋 복사하기</button></div>
+  </div>
+</section>
+
+<!-- 3. 레벨업 -->
+<section data-t="③ 레벨업">
+  <p class="sec">미션 ③</p>
+  <h2>레벨업 퀘스트 기록지</h2><hr class="t">
+  <p class="lead">레벨마다 문장을 하나씩 더하고, 아래 프롬프트를 <b>새 채팅</b>에 붙여넣어 보세요. 답변 만족도는 ★로 기록해요.</p>
+  <div id="lvs"></div>
+  <div class="card blue">
+    <div id="lvDiff" style="font-weight:800;font-size:18px"></div>
+    <p style="margin:12px 0 8px;font-weight:700">가장 효과가 컸던 공식은?</p>
+    <div class="pick" id="best"></div>
+  </div>
+</section>
+
+<!-- 4. 헌터 -->
+<section data-t="④ 헌터">
+  <p class="sec">미션 ④</p>
+  <h2>할루시네이션 헌터 답안지</h2><hr class="t">
+  <div class="two">
+    <img class="mock" src="img/hunter.webp" alt="AI 역사 5줄 정리 화면">
+    <div>
+      <p class="lead">5문장 중 거짓은 3개! O·X를 고르고, 틀린 문장은 바르게 고쳐 보세요.</p>
+      <div id="hunt"></div>
+    </div>
+  </div>
+  <div class="card mt chk">
+    <b>검증 체크리스트</b> <span class="hint">내 레벨업 퀘스트 Lv.5 답변도 점검해 보세요</span>
+    <div id="chk" class="mt"></div>
+  </div>
+</section>
+
+<!-- 5. 마무리 -->
+<section data-t="⑤ 마무리">
+  <p class="sec">마무리</p>
+  <h2>나의 최종 프롬프트 & 다짐</h2><hr class="t">
+  <div class="card">
+    <span class="chip">나의 최종 프롬프트 (Lv.5 완성본)</span>
+    <p class="hint">역할 → 맥락 → 지시 → 형식 → 제약 순서로 한 문단. 내 말로 다듬어 보세요.</p>
+    <textarea data-k="fin.final" style="min-height:120px"></textarea>
+    <div class="mt"><button class="btn sm ghost" id="loadLv5">Lv.5 프롬프트 불러오기</button></div>
+  </div>
+  <div class="card">
+    <span class="chip" style="background:var(--grn)">다음 수행평가에 써먹을 프롬프트</span>
+    <textarea class="mt" data-k="fin.next" placeholder="예) 너는 ○○ 과목 선생님이야. 고등학생 수준으로, 출처를 달고, 모르면 모른다고 답해 줘."></textarea>
+  </div>
+  <div class="card">
+    <span class="chip" style="background:var(--org)">오늘 발견한 나의 강점</span>
+    <textarea class="mt" data-k="fin.strength" placeholder="예) 논리적으로 질문을 설계하는 능력, 꼼꼼한 검증 습관"></textarea>
+  </div>
+  <div class="banner">다 썼으면 아래 <em>[선생님께 보내기]</em>를 눌러 주세요!<br>수정하고 다시 보내도 마지막 내용으로 바뀌어요.</div>
+  <div class="mt r"><button class="btn sm ghost" id="reset" style="color:var(--red);border-color:var(--red)">이 기기 기록 지우기 (다음 학생용)</button></div>
+  <p class="brand">바로교육연구소</p>
+</section>
+
+</main>
+<footer><div class="in">
+  <button class="btn ghost" id="prev">◀</button>
+  <button class="btn send" id="send">📤 선생님께 보내기</button>
+  <button class="btn ghost" id="next">▶</button>
+</div></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- 설정: 수업 코드(?c=)와 시트 주소(#api=)는 선생님 화면 QR에 들어 있음 ----------
+const DEFAULT_API = "";
+const Q = new URLSearchParams(location.search);
+const H = new URLSearchParams(location.hash.slice(1));
+const ls = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+             set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+             del(k){ try { localStorage.removeItem(k); } catch(e){} } };
+if (Q.get("c")) ls.set("pq_class", Q.get("c"));
+if (H.get("api")) { ls.set("pq_api", H.get("api")); history.replaceState(null, "", location.pathname + location.search); }
+const CLASS = ls.get("pq_class") || "기본";
+const API = ls.get("pq_api") || DEFAULT_API;
+const KEY = "pq_state_" + CLASS;
+document.getElementById("code").textContent = "수업 " + CLASS;
+
+const blank = () => ({ info:{}, score:["","","","",""], rev:{}, card:{}, lv:{sent:["","","","",""], sum:["","","","",""], star:[0,0,0,0,0], best:""}, hunt:{ox:["","","","",""], fix:["","","","",""], chk:[false,false,false,false,false]}, fin:{} });
+let S = blank();
+try { const o = JSON.parse(ls.get(KEY) || "null"); if (o) S = Object.assign(blank(), o); } catch(e){}
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const getP = p => p.split(".").reduce((o,k) => o?.[k], S);
+const setP = (p,v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o,k) => o[k] ??= {}, S)[last] = v; };
+let saveT; function save(){ clearTimeout(saveT); saveT = setTimeout(() => { ls.set(KEY, JSON.stringify(S)); $("#st").textContent = "자동 저장됨 " + new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}); }, 300); }
+function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), 2200); }
+
+// ---------- 탭 ----------
+const secs = $$("section"); let cur = 0;
+$("#nav").innerHTML = secs.map((s,i) => `<button data-i="${i}">${s.dataset.t}</button>`).join("");
+function go(i){ cur = Math.max(0, Math.min(secs.length-1, i)); secs.forEach((s,k) => s.classList.toggle("on", k===cur)); $$("#nav button").forEach((b,k) => b.classList.toggle("on", k===cur)); window.scrollTo(0,0); if (cur===3) renderLv(); ls.set("pq_tab", cur); }
+$("#nav").onclick = e => { const b = e.target.closest("button"); if (b) go(+b.dataset.i); };
+$("#prev").onclick = () => go(cur-1); $("#next").onclick = () => go(cur+1);
+
+// ---------- 시작: 퀘스트 카드 · 점수판 ----------
+const QC = [["예술·디자인","웹툰 작가가 되려면 지금 무엇을 해야 할까?"],["보건·의료","간호학과에 가려면 어떤 과목을 잘해야 할까?"],["IT·공학","AI 시대에도 컴퓨터공학과는 유망할까?"],
+            ["경영·경제","경영학과에 가면 4년 동안 무엇을 배울까?"],["게임·콘텐츠","게임 기획자는 하루에 어떤 일을 할까?"],["서비스·항공","승무원이 되려면 영어를 얼마나 잘해야 할까?"]];
+$("#qcards").innerHTML = QC.map(([f,q],i) => `<button class="qc" data-i="${i}"><b><i>${i+1}</i>${f}</b><span>${q}</span></button>`).join("");
+const qInput = $('[data-k="info.quest"]');
+function pickQ(i){ $$(".qc").forEach((b,k) => b.classList.toggle("hit", k===i)); qInput.value = QC[i][1]; setP("info.quest", QC[i][1]); save(); }
+$("#qcards").onclick = e => { const b = e.target.closest(".qc"); if (b) pickQ(+b.dataset.i); };
+$("#dice").onclick = () => { let n = 0, i = 0; const t = setInterval(() => { i = Math.floor(Math.random()*6); $$(".qc").forEach((b,k) => b.classList.toggle("hit", k===i)); if (++n > 12){ clearInterval(t); pickQ(i); toast(`🎲 ${i+1}번 카드! 단어를 내 관심 분야로 바꿔도 좋아요`); } }, 90); };
+const MS = [["① 리버스","맞힌 요소당 1점"],["② 캐릭터 카드","완성 1점"],["③ 레벨업","Lv.5 완주 3점"],["④ 헌터","1등 3·2등 2점"],["⑤ 쇼케이스","베스트 3점"]];
+$("#score").innerHTML = MS.map(([h,b],i) => `<div><b>${h}</b><small>${b}</small><input type="number" inputmode="numeric" data-k="score.${i}"></div>`).join("") + `<div class="tot"><b>합계</b><strong id="tot">0</strong></div>`;
+const tot = () => { $("#tot").textContent = S.score.reduce((a,v) => a + (+v||0), 0); };
+
+// ---------- 리버스 ----------
+const REV = [["role","역할","AI는 누구였을까?","var(--b)"],["context","맥락","질문한 사람의 상황은?","var(--grn)"],["task","지시","무엇을 몇 개 요청했을까?","var(--org)"],["format","형식","어떤 모양으로 달라고 했을까?","var(--pur)"],["bonus","보너스","말투·조건은?","#4D4D4D"]];
+$("#rev").innerHTML = REV.map(([k,h,q,c]) => `<div class="el"><span class="chip" style="background:${c}">${h}</span><div><small>${q}</small><input type="text" data-k="rev.${k}"></div></div>`).join("");
+
+// ---------- 캐릭터 카드 ----------
+const CARD = [["role","역할 (전문 분야)","예) 시각디자인학과 교수"],["context","맥락 (나에 대해)","예) 고1인데 그림은 좋아하지만 포트폴리오가 없어"],["task","지시 (주특기)","예) 포트폴리오 주제 3가지를 추천해 줘"],["format","형식 (답변 스타일)","예) 표로 정리하고 마지막에 응원 한 줄을 써 줘"],["limit","제약 (절대 규칙)","예) 고등학생 수준으로, 모르면 모른다고 답해 줘"]];
+$("#cardf").innerHTML = CARD.map(([k,h,ex],i) => `<label class="f"><span><span class="chip" style="${i===4?"background:#4D4D4D":""}">${h}</span></span><input type="text" data-k="card.${k}" placeholder="${ex}"></label>`).join("");
+const dot = s => { s = (s||"").trim(); return !s ? "" : /[.!?~]$/.test(s) ? s : s + "."; };
+const josa = w => { const c = (w||"").trim().slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 && (c-0xAC00)%28 ? "이야" : "야"; };
+const cardLines = () => { const c = S.card; return {
+  role: c.role ? `너는 ${c.role.trim().replace(/[.]$/,"")}${josa(c.role.replace(/[.]$/,""))}.` : "",
+  context: c.context ? dot("나는 " + c.context.trim().replace(/^나는\s*/,"")) : "",
+  tf: [dot(c.task), dot(c.format)].filter(Boolean).join(" "), limit: dot(c.limit) }; };
+function renderCardOut(){ const l = cardLines(), t = [l.role, l.context, l.tf, l.limit].filter(Boolean).join(" "); const o = $("#cardOut"); o.textContent = t || "칸을 채우면 여기에 프롬프트가 완성돼요"; o.classList.toggle("mute", !t); }
+
+// 그림판
+const cv = $("#cv"), cx = cv.getContext("2d"); let pen = "#222222", drawing = false, last = null;
+const COLS = ["#222222","#1554CA","#E74C3C","#F1C40F","#2ECC71","#8E44AD","#FF8FB1"];
+$("#pal").innerHTML = COLS.map(c => `<button data-c="${c}" style="background:${c}"></button>`).join("") + `<button class="tx" data-c="#FFFFFF">지우개</button><button class="tx" data-c="clear">전체 지우기</button>`;
+function palOn(){ $$("#pal button").forEach(b => b.classList.toggle("on", b.dataset.c === pen)); } palOn();
+$("#pal").onclick = e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.c === "clear"){ clearCv(); S.card.img = ""; save(); return; } pen = b.dataset.c; palOn(); };
+function clearCv(){ cx.fillStyle = "#fff"; cx.fillRect(0,0,480,480); cx.fillStyle = "#c8c8c8"; cx.font = "600 34px Pretendard, sans-serif"; cx.textAlign = "center"; cx.fillText("내 AI 비서 그려 보기", 240, 250); cv._empty = true; }
+const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * 480 / r.width, (e.clientY - r.top) * 480 / r.height]; };
+cv.addEventListener("pointerdown", e => { if (cv._empty){ cx.fillStyle = "#fff"; cx.fillRect(0,0,480,480); cv._empty = false; } drawing = true; last = pos(e); cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!drawing) return; const p = pos(e); cx.strokeStyle = pen; cx.lineWidth = pen === "#FFFFFF" ? 34 : 9; cx.lineCap = cx.lineJoin = "round"; cx.beginPath(); cx.moveTo(...last); cx.lineTo(...p); cx.stroke(); last = p; });
+const endDraw = () => { if (!drawing) return; drawing = false; const t = document.createElement("canvas"); t.width = t.height = 200; t.getContext("2d").drawImage(cv, 0, 0, 200, 200); S.card.img = t.toDataURL("image/jpeg", .7); save(); };
+cv.addEventListener("pointerup", endDraw); cv.addEventListener("pointercancel", endDraw);
+clearCv(); if (S.card.img){ const im = new Image(); im.onload = () => { cx.drawImage(im, 0, 0, 480, 480); cv._empty = false; }; im.src = S.card.img; }
+
+// ---------- 레벨업 ----------
+const LV = [["Lv.1","한 줄 질문","#9DB9F2"],["Lv.2","+ 역할","#7FA2EC"],["Lv.3","+ 맥락","#5A86E2"],["Lv.4","+ 지시·형식","#3468D8"],["Lv.5 BOSS","+ 제약 조건","#C0392B"]];
+const LVPH = ["오늘의 퀘스트 질문 (한 줄)", "너는 ○○ 전문가야.", "나는 ○○ 상황이야.", "○개를 표로 정리해 줘.", "모르면 모른다고 답해 줘."];
+$("#lvs").innerHTML = LV.map(([l,h,c],i) => `<div class="lv"><div class="hd" style="background:${c}">${l} <small>${h}</small></div><div class="bd">
+  <label class="f" style="margin:0"><span>${i===0 ? "Lv.1 질문" : "이번 레벨에 추가한 문장"}</span><textarea data-k="lv.sent.${i}" placeholder="${LVPH[i]}" style="min-height:56px"></textarea></label>
+  <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:14px">AI에 붙여넣을 Lv.${i+1} 프롬프트</b><button class="btn sm" data-copy="lvp${i}">📋 복사</button></div><div class="out" id="lvp${i}"></div></div>
+  <label class="f" style="margin:0"><span>AI 답변 한 줄 요약</span><input type="text" data-k="lv.sum.${i}"></label>
+  <div style="display:flex;align-items:center;gap:10px"><b style="font-size:14px">만족도</b><div class="stars" data-lv="${i}"></div></div></div></div>`).join("");
+const BEST = ["역할","맥락","지시·형식","제약 조건"];
+$("#best").innerHTML = BEST.map(b => `<button data-b="${b}">${b}</button>`).join("");
+$("#best").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.lv.best = b.dataset.b; save(); renderLv(); };
+const lvPrompt = n => { const s = S.lv.sent.map(x => (x||"").trim()); return [n>=1 && s[1], n>=2 && s[2], s[0], n>=3 && s[3], n>=4 && s[4]].filter(Boolean).join(" "); };
+function prefillLv(){ const l = cardLines(); if (!S.lv.sent[0] && S.info.quest) S.lv.sent[0] = S.info.quest; [[1,l.role],[2,l.context],[3,l.tf],[4,l.limit]].forEach(([i,v]) => { if (!S.lv.sent[i] && v) S.lv.sent[i] = v; }); }
+function renderLv(){
+  prefillLv();
+  $$('[data-k^="lv.sent."]').forEach(el => { if (document.activeElement !== el) el.value = getP(el.dataset.k) || ""; });
+  for (let i = 0; i < 5; i++){ const t = lvPrompt(i); const o = $("#lvp"+i); o.textContent = t || "위 칸을 채우면 프롬프트가 만들어져요"; o.classList.toggle("mute", !t); }
+  $$(".stars").forEach(d => { const i = +d.dataset.lv, v = S.lv.star[i]; d.innerHTML = [1,2,3,4,5].map(k => `<button data-v="${k}">${k <= v ? "★" : "☆"}</button>`).join(""); });
+  const a = S.lv.star[0], b = S.lv.star[4];
+  $("#lvDiff").innerHTML = `별 개수 변화: Lv.1 <span style="color:#E6A700">${a}개</span> → Lv.5 <span style="color:#E6A700">${b}개</span>` + (a && b ? `  (${b-a >= 0 ? "+" : ""}${b-a})` : "");
+  $$("#best button").forEach(x => x.classList.toggle("on", x.dataset.b === S.lv.best));
+}
+$("#lvs").addEventListener("click", e => { const b = e.target.closest(".stars button"); if (!b) return; const i = +b.parentNode.dataset.lv, v = +b.dataset.v; S.lv.star[i] = S.lv.star[i] === v ? v - 1 : v; save(); renderLv(); });
+
+// ---------- 헌터 ----------
+$("#hunt").innerHTML = [0,1,2,3,4].map(i => `<div class="hunt"><b>${i+1}</b><div class="ox" data-h="${i}"><button class="o">O</button><button class="x">X</button></div><input type="text" data-k="hunt.fix.${i}" placeholder="근거 · 바르게 고치기"></div>`).join("");
+function renderOx(){ $$(".ox").forEach(d => { const v = S.hunt.ox[+d.dataset.h]; d.querySelector(".o").classList.toggle("on", v==="O"); d.querySelector(".x").classList.toggle("on", v==="X"); }); }
+$("#hunt").addEventListener("click", e => { const b = e.target.closest(".ox button"); if (!b) return; const i = +b.parentNode.dataset.h, v = b.classList.contains("o") ? "O" : "X"; S.hunt.ox[i] = S.hunt.ox[i] === v ? "" : v; save(); renderOx(); });
+const CHK = ["내 질문의 의도와 상황에 맞는 답인가?","숫자·이름·학과 정보·출처를 다른 자료로 확인했는가?","주제와 상관없는 엉뚱한 문장은 없는가?","뻔한 말이 아니라 나에게 맞는 구체적인 내용인가?","최종 정리는 내 말로 다시 썼는가?"];
+$("#chk").innerHTML = CHK.map((c,i) => `<label><input type="checkbox" data-k="hunt.chk.${i}">${c}</label>`).join("");
+
+// ---------- 마무리 ----------
+$("#loadLv5").onclick = () => { const t = lvPrompt(4); if (!t) return toast("레벨업 기록지를 먼저 채워 주세요"); const el = $('[data-k="fin.final"]'); if (el.value && !confirm("지금 쓴 내용을 Lv.5 프롬프트로 바꿀까요?")) return; el.value = t; S.fin.final = t; save(); };
+$("#reset").onclick = () => { if (!confirm("이 기기에 저장된 내 워크시트를 모두 지울까요? (선생님께 보낸 내용은 남아 있어요)")) return; ls.del(KEY); ls.del("pq_tab"); location.reload(); };
+
+// ---------- 입력 바인딩 ----------
+function bind(){ $$("[data-k]").forEach(el => { const v = getP(el.dataset.k); if (el.type === "checkbox") el.checked = !!v; else el.value = v ?? ""; }); }
+document.addEventListener("input", e => { const el = e.target.closest("[data-k]"); if (!el) return; setP(el.dataset.k, el.type === "checkbox" ? el.checked : el.value); save();
+  if (el.dataset.k.startsWith("score.")) tot(); if (el.dataset.k.startsWith("card.")) renderCardOut();
+  if (el.dataset.k.startsWith("lv.sent.")) for (let i = 0; i < 5; i++){ const t = lvPrompt(i), o = $("#lvp"+i); o.textContent = t || "위 칸을 채우면 프롬프트가 만들어져요"; o.classList.toggle("mute", !t); } });
+document.addEventListener("click", async e => { const b = e.target.closest("[data-copy]"); if (!b) return; const o = $("#"+b.dataset.copy); if (o.classList.contains("mute")) return toast("복사할 내용이 아직 없어요");
+  try { await navigator.clipboard.writeText(o.textContent); toast("복사했어요! AI 새 채팅에 붙여넣으세요"); } catch(err){ const r = document.createRange(); r.selectNodeContents(o); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("글자가 선택됐어요. 길게 눌러 복사하세요"); } });
+
+// ---------- 선생님께 보내기 (구글 시트) ----------
+function row(){ const i = S.info, j = (a) => a.join(" / ");
+  const r = { "수업코드": CLASS, "키": [CLASS, i.grade, i.ban, i.team, i.num].join("|"), "학년": i.grade||"", "반": i.ban||"", "번호": i.num||"", "이름": i.name||"", "모둠": i.team||"",
+    "관심학과": i.interest||"", "퀘스트질문": i.quest||"", "모둠점수합계": S.score.reduce((a,v) => a + (+v||0), 0) };
+  REV.forEach(([k,h]) => r["리버스_"+h] = S.rev[k]||""); r["리버스_추리프롬프트"] = S.rev.prompt||""; r["리버스_맞힌요소"] = S.rev.hit||"";
+  r["비서이름"] = S.card.name||""; CARD.forEach(([k,h]) => r["카드_"+h.split(" ")[0]] = S.card[k]||"");
+  for (let n = 0; n < 5; n++){ r[`Lv${n+1}_문장`] = S.lv.sent[n]||""; r[`Lv${n+1}_요약`] = S.lv.sum[n]||""; r[`Lv${n+1}_별`] = S.lv.star[n]||0; }
+  r["효과큰공식"] = S.lv.best||""; r["헌터_OX"] = j(S.hunt.ox.map((v,k) => `${k+1}${v||"-"}`)); r["헌터_고친내용"] = j(S.hunt.fix.map((v,k) => v ? `${k+1}) ${v}` : "").filter(Boolean));
+  r["체크리스트"] = S.hunt.chk.filter(Boolean).length + "/5"; r["최종프롬프트"] = S.fin.final||""; r["수행평가프롬프트"] = S.fin.next||""; r["나의강점"] = S.fin.strength||"";
+  r["캐릭터그림"] = S.card.img||""; const js = JSON.parse(JSON.stringify(S)); delete js.card.img; delete js.info.name; r["_json"] = JSON.stringify(js); return r; }
+$("#send").onclick = async () => {
+  if (!S.info.team || !S.info.num){ go(0); return toast("모둠과 번호를 먼저 적어 주세요"); }
+  if (!API) return toast("선생님 화면과 아직 연결되지 않았어요. 내용은 이 기기에 저장돼 있어요");
+  const btn = $("#send"); btn.disabled = true; btn.textContent = "보내는 중…";
+  const body = JSON.stringify(row());
+  try { const res = await fetch(API, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body }); const j = await res.json(); if (!j.ok) throw new Error(j.error||"fail"); toast("✅ 선생님께 보냈어요!"); }
+  catch(err){ try { await fetch(API, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body }); toast("📤 보냈어요! (화면에 안 보이면 다시 눌러 주세요)"); } catch(e2){ toast("보내기 실패: 인터넷 연결을 확인해 주세요"); } }
+  btn.disabled = false; btn.textContent = "📤 선생님께 보내기";
+};
+
+bind(); tot(); renderCardOut(); renderOx(); renderLv(); go(+(ls.get("pq_tab")||0));
+if (S.info.quest){ const k = QC.findIndex(q => q[1] === S.info.quest); if (k >= 0) $$(".qc")[k].classList.add("hit"); }
+</script>
+</body>
+</html>
