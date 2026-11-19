@@ -49,9 +49,9 @@ function doPost(e) {
   }
 }
 
-// 선생님 화면용: ?c=수업코드 → 그 수업의 학생 기록 목록 (이름은 보내지 않음)
+// 선생님 화면용: ?code=수업코드 → 그 수업의 학생 기록 목록 (이름은 보내지 않음, ?c=는 구글 예약어라 못 씀)
 function doGet(e) {
-  const c = (e.parameter.c || '').trim();
+  const c = (e.parameter.code || '').trim();
   const sh = sheet_(), n = sh.getLastRow(), m = sh.getLastColumn();
   if (n < 2 || !c) return json_({ ok: true, rows: [] });
   const v = sh.getRange(1, 1, n, m).getValues(), head = v[0];

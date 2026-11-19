@@ -168,7 +168,7 @@ function head(){ $("#code").textContent = "수업 " + (CODE || "미설정") + (D
 async function load(){
   if (DEMO){ ROWS = demo(); return render(); }
   if (!API || !CODE) return;
-  try { const r = await fetch(API + "?c=" + encodeURIComponent(CODE)); const j = await r.json();
+  try { const r = await fetch(API + "?code=" + encodeURIComponent(CODE)); const j = await r.json();
     ROWS = (j.rows||[]).map(x => { try { const s = JSON.parse(x.json); s._img = x.img; return s; } catch(e){ return null; } }).filter(Boolean);
     $("#upd").textContent = "갱신 " + new Date().toLocaleTimeString("ko-KR"); render(); }
   catch(e){ $("#upd").textContent = "불러오기 실패 — 주소·인터넷 확인"; }
