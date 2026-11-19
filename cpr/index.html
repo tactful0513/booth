@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#FFEAF1">
+<title>하트비트 CPR</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--ink:#2B1630;--sub:#8B6F92;--pink:#FF4F81;--rose:#FF8FB1;--peach:#FFB38A;--lav:#A98BFF;--mint:#16C08A;--amber:#FF9F1C;--glass:rgba(255,255,255,.6);--edge:rgba(255,255,255,.9)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--ink);background:#FFF3F6;-webkit-user-select:none;user-select:none;touch-action:manipulation;letter-spacing:-.02em}
+button,input{font:inherit;color:inherit;letter-spacing:inherit}
+button{border:0;background:none;cursor:pointer}
+.bg{position:fixed;inset:0;background:linear-gradient(165deg,#FFF6F8 0%,#FFE7EF 46%,#EEE7FF 100%);overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(56px);opacity:.6;animation:float 16s ease-in-out infinite}
+.b1{width:300px;height:300px;background:#FFB6CB;top:-90px;left:-90px}
+.b2{width:280px;height:280px;background:#D5C6FF;bottom:-60px;right:-100px;animation-delay:-6s}
+.b3{width:200px;height:200px;background:#FFD6C2;top:42%;left:58%;animation-delay:-11s}
+@keyframes float{50%{transform:translate(22px,34px) scale(1.1)}}
+.app{position:relative;height:100%;max-width:440px;margin:0 auto}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 20px calc(18px + env(safe-area-inset-bottom));opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .4s,transform .4s,visibility .4s}
+.screen.on{opacity:1;visibility:visible;transform:none}
+.glass{background:var(--glass);border:1px solid var(--edge);border-radius:24px;box-shadow:0 12px 32px rgba(255,79,129,.10),inset 0 1px 0 #fff;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;color:var(--pink);background:rgba(255,255,255,.75);border:1px solid #fff}
+.chip i{width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 3px rgba(255,79,129,.18)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:18px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(120deg,#FF4F81 0%,#FF7A8A 55%,#FFB38A 100%);box-shadow:0 10px 24px rgba(255,79,129,.32),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{color:var(--ink);background:rgba(255,255,255,.72);border:1px solid #fff;box-shadow:0 6px 18px rgba(169,139,255,.14)}
+.heart{display:block}
+.beat{animation:beat 1.1s ease-in-out infinite}
+@keyframes beat{0%,40%,100%{transform:scale(1)}12%{transform:scale(1.1)}26%{transform:scale(1.04)}}
+
+/* HOME */
+#home{justify-content:space-between;text-align:center}
+.hero{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:2vh}
+.hero .heart{width:min(36vw,150px);filter:drop-shadow(0 18px 26px rgba(255,79,129,.35))}
+.hero h1{font-size:clamp(32px,9.5vw,40px);font-weight:900;line-height:1.08;letter-spacing:-.04em}
+.hero h1 em{font-style:normal;background:linear-gradient(110deg,#FF4F81,#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:15px;color:var(--sub);font-weight:500}
+.pills{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.pill{font-size:12px;font-weight:700;padding:7px 11px;border-radius:12px;background:rgba(255,255,255,.7);border:1px solid #fff;color:#6B4F73}
+.pill b{color:var(--pink)}
+.nick{width:100%;height:50px;border-radius:16px;border:1px solid #fff;background:rgba(255,255,255,.7);padding:0 16px;font-size:16px;text-align:center;outline:none;-webkit-user-select:text;user-select:text}
+.nick:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(255,143,177,.2)}
+.modes{display:flex;flex-direction:column;gap:10px}
+.mode{display:flex;align-items:center;gap:14px;padding:14px 16px;text-align:left;transition:transform .15s}
+.mode:active{transform:scale(.98)}
+.mode .ic{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:linear-gradient(140deg,#FFE0EA,#FFF);box-shadow:inset 0 0 0 1px #fff}
+.mode.alt .ic{background:linear-gradient(140deg,#E8DEFF,#FFF)}
+.mode b{display:block;font-size:17px;font-weight:800;color:var(--ink)}
+.mode span{display:block;font-size:13px;color:var(--sub);margin-top:2px}
+.mode .go{margin-left:auto;font-size:20px;color:var(--rose)}
+.best{font-size:12px;color:var(--sub);min-height:16px}
+.credit{font-size:11px;color:#B39BB8}
+
+/* QUIZ */
+.top{display:flex;align-items:center;justify-content:space-between;min-height:40px}
+.x{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:18px;color:var(--sub);background:rgba(255,255,255,.7);border:1px solid #fff}
+.ttl{margin:14px 0 4px;font-size:26px;font-weight:900;letter-spacing:-.04em}
+.desc{font-size:14px;color:var(--sub);margin-bottom:16px;line-height:1.5}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{position:relative;padding:16px 14px;min-height:150px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;transition:transform .15s,box-shadow .2s,background .2s}
+.card:active{transform:scale(.97)}
+.card .em{font-size:30px;line-height:1}
+.card b{font-size:16px;font-weight:800}
+.card span{font-size:12.5px;color:var(--sub);line-height:1.45}
+.card .no{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;background:linear-gradient(135deg,#FF4F81,#FF9A8A);transform:scale(0);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.card.ok{background:rgba(255,255,255,.9);box-shadow:0 0 0 2px var(--rose),0 12px 26px rgba(255,79,129,.18)}
+.card.ok .no{transform:scale(1)}
+.card.no-go{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.qmsg{margin-top:14px;min-height:22px;text-align:center;font-size:14px;font-weight:700;color:var(--pink)}
+.push{margin-top:auto}
+.hide{visibility:hidden}
+
+/* READY */
+.tips{display:flex;flex-direction:column;gap:10px}
+.tip{display:flex;gap:14px;align-items:center;padding:14px 16px}
+.tip .n{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:20px;background:linear-gradient(140deg,#FFE3EC,#fff)}
+.tip b{display:block;font-size:15.5px;font-weight:800}
+.tip span{display:block;font-size:13px;color:var(--sub);margin-top:2px;line-height:1.4}
+.tip b em{font-style:normal;color:var(--pink)}
+
+/* PLAY */
+#play{touch-action:none;padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+.hud{display:flex;align-items:center;gap:10px}
+.prog{flex:1}
+.prog .lbl{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.prog .lbl b{color:var(--ink);font-size:14px}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.75);overflow:hidden;box-shadow:inset 0 0 0 1px #fff}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#FF4F81,#FFB38A);transition:width .25s}
+.mon{margin-top:14px;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#311A37,#24132A);color:#fff;box-shadow:0 16px 34px rgba(49,26,55,.28)}
+.mon .row{display:flex;align-items:flex-end;justify-content:space-between}
+.mon .k{font-size:11px;font-weight:700;letter-spacing:.08em;color:#C9A9D3}
+.mon .v{font-size:34px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.mon .v small{font-size:13px;font-weight:600;color:#C9A9D3;margin-left:4px}
+.state{font-size:12px;font-weight:800;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.1);color:#E6D6EA}
+.state.good{background:rgba(22,192,138,.2);color:#5CF0BC}
+.state.fast,.state.slow{background:rgba(255,159,28,.2);color:#FFC36B}
+#ecg{display:block;width:100%;height:64px;margin:8px 0 6px}
+.gauge{position:relative;height:8px;border-radius:9px;background:linear-gradient(90deg,#5B3B63 0%,#5B3B63 33.3%,#16C08A 33.3%,#16C08A 66.6%,#5B3B63 66.6%)}
+.gauge .needle{position:absolute;top:-5px;width:4px;height:18px;margin-left:-2px;border-radius:3px;background:#fff;box-shadow:0 0 10px #FF8FB1;left:50%;transition:left .2s}
+.gscale{display:flex;justify-content:space-between;font-size:10px;color:#A88BB0;margin-top:5px;font-weight:600}
+.gscale span:nth-child(2){color:#5CF0BC}
+.stage{position:relative;flex:1;display:grid;place-items:center;min-height:200px}
+.ring{position:absolute;width:160px;height:160px;border-radius:50%;border:3px solid var(--rose);box-shadow:0 0 18px rgba(255,79,129,.35);opacity:0;pointer-events:none;will-change:transform,opacity}
+.target{position:relative;width:160px;height:160px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,rgba(255,255,255,.55) 60%);border:2px solid #fff;box-shadow:0 0 0 10px rgba(255,255,255,.35),0 18px 40px rgba(255,79,129,.25)}
+.target .heart{width:84px;transition:transform .08s}
+.target.hit .heart{transform:scale(.82)}
+.target.pulse{animation:tpulse .3s ease-out}
+@keyframes tpulse{0%{box-shadow:0 0 0 10px rgba(255,255,255,.35),0 0 0 0 rgba(255,79,129,.45)}100%{box-shadow:0 0 0 10px rgba(255,255,255,.35),0 0 0 26px rgba(255,79,129,0)}}
+.count{position:absolute;font-size:64px;font-weight:900;color:var(--pink);text-shadow:0 8px 24px rgba(255,79,129,.35);pointer-events:none}
+.judge{position:absolute;top:8px;left:0;right:0;text-align:center;pointer-events:none}
+.judge b{display:block;font-size:30px;font-weight:900;letter-spacing:.02em;font-style:italic}
+.judge span{display:block;font-size:14px;font-weight:700;color:var(--sub);margin-top:2px}
+.judge.pop{animation:pop .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.j-perfect b{background:linear-gradient(90deg,#FF4F81,#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.j-good b{color:var(--mint)}
+.j-miss b{color:#B79CBD}
+.combo{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:13px;font-weight:800;color:var(--lav);letter-spacing:.06em;pointer-events:none}
+.combo b{font-size:20px}
+.hint{text-align:center;font-size:14px;font-weight:700;color:var(--sub)}
+.hint em{font-style:normal;color:var(--pink)}
+.banner{position:absolute;left:20px;right:20px;top:40%;padding:18px;text-align:center;pointer-events:none;opacity:0;transform:translateY(10px) scale(.96);transition:.35s}
+.banner.on{opacity:1;transform:none}
+.banner b{display:block;font-size:20px;font-weight:900}
+.banner span{display:block;font-size:13.5px;color:var(--sub);margin-top:4px}
+
+/* RESULT */
+#result{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.res{display:flex;flex-direction:column;gap:12px;padding-bottom:6px}
+.rhead{text-align:center;padding:22px 16px 18px;position:relative;overflow:hidden}
+.rhead .heart{width:70px;margin:0 auto 6px}
+.rhead .heart.dead{filter:grayscale(1) opacity(.45)}
+.grade{display:inline-grid;place-items:center;width:58px;height:58px;border-radius:20px;font-size:30px;font-weight:900;color:#fff;background:linear-gradient(135deg,#FF4F81,#B07CFF);box-shadow:0 10px 22px rgba(176,124,255,.35)}
+.gtitle{margin-top:10px;font-size:22px;font-weight:900}
+.score{font-size:56px;font-weight:900;line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums;background:linear-gradient(110deg,#FF4F81,#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.score small{font-size:20px}
+.rmsg{font-size:14px;color:var(--sub);margin-top:4px;line-height:1.5}
+.rname{font-size:12px;color:#B39BB8;margin-top:10px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{padding:12px 6px;text-align:center}
+.stat b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat span{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--sub);margin-top:2px}
+.stat.p b{color:var(--pink)}.stat.g b{color:var(--mint)}.stat.m b{color:#B79CBD}
+.metrics{padding:6px 16px}
+.metrics div{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:14px;color:var(--sub);font-weight:600}
+.metrics div+div{border-top:1px dashed rgba(139,111,146,.25)}
+.metrics b{color:var(--ink);font-size:15px;font-weight:800}
+.metrics b.ok{color:var(--mint)}
+.facts{padding:16px}
+.facts h3{font-size:15px;font-weight:900;margin-bottom:10px}
+.facts li{list-style:none;display:flex;gap:10px;font-size:13.5px;line-height:1.5;color:#5A4260;padding:5px 0}
+.facts li i{flex:none;font-style:normal;width:20px;height:20px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;background:var(--rose);margin-top:1px}
+.facts li b{color:var(--pink)}
+.rbtns{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF9BB8"/><stop offset=".55" stop-color="#FF4F81"/><stop offset="1" stop-color="#E8336B"/></linearGradient>
+    <symbol id="heart" viewBox="0 0 120 108"><path d="M60 104C22 77 3 55 3 32 3 15 16 3 32.5 3 44 3 54 9 60 19 66 9 76 3 87.5 3 104 3 117 15 117 32c0 23-19 45-57 72Z" fill="url(#hg)"/><ellipse cx="33" cy="27" rx="15" ry="8" fill="#fff" opacity=".38" transform="rotate(-32 33 27)"/></symbol>
+  </defs>
+</svg>
+<div class="bg"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
+
+<main class="app">
+  <!-- HOME -->
+  <section class="screen on" id="home">
+    <div><span class="chip"><i></i>응급처치 아이스브레이킹</span></div>
+    <div class="hero">
+      <svg class="heart beat"><use href="#heart"/></svg>
+      <h1>하트비트 <em>CPR</em></h1>
+      <p>박자에 맞춰 탭! 멈춘 심장을 다시 뛰게 해요</p>
+      <div class="pills"><span class="pill">속도 <b>분당 100~120회</b></span><span class="pill">깊이 <b>약 5cm</b></span><span class="pill">한 세트 <b>30회</b></span></div>
+    </div>
+    <div class="modes">
+      <input class="nick" id="nick" maxlength="10" placeholder="닉네임 (선택)" autocomplete="off">
+      <button class="mode glass" data-mode="rhythm"><span class="ic">🎧</span><span><b>리듬 모드</b><span>가이드 링과 소리를 따라 30회</span></span><span class="go">›</span></button>
+      <button class="mode glass alt" data-mode="real"><span class="ic">🔥</span><span><b>실전 모드</b><span>10회 후 가이드 OFF, 혼자 박자 유지!</span></span><span class="go">›</span></button>
+      <div class="best" id="bestTxt"></div>
+    </div>
+    <div class="credit">바로교육연구소 · 응급처치 교육</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="quiz">
+    <div class="top"><button class="x" data-home>✕</button><span class="chip"><i></i>STEP 1 · 순서 퀴즈</span><span style="width:40px"></span></div>
+    <h2 class="ttl">쓰러진 사람을 봤다면?</h2>
+    <p class="desc">가슴압박 전에 해야 할 일이 있어요.<br>올바른 <b>순서대로</b> 카드를 눌러보세요.</p>
+    <div class="cards" id="cards"></div>
+    <div class="qmsg" id="qmsg"></div>
+    <button class="btn push hide" id="qNext">좋아요! 가슴압박 준비 →</button>
+  </section>
+
+  <!-- READY -->
+  <section class="screen" id="ready">
+    <div class="top"><button class="x" data-home>✕</button><span class="chip"><i></i>STEP 2 · 자세 잡기</span><span style="width:40px"></span></div>
+    <h2 class="ttl">이렇게 눌러요</h2>
+    <p class="desc">화면 속 하트를 환자의 가슴이라고 생각하고<br>박자에 맞춰 <b>30번</b> 탭하세요.</p>
+    <div class="tips">
+      <div class="tip glass"><span class="n">🎯</span><span><b>위치 · <em>가슴 정중앙</em></b><span>가슴뼈의 아래쪽 절반에 손바닥 뒤꿈치</span></span></div>
+      <div class="tip glass"><span class="n">🙌</span><span><b>자세 · <em>깍지 끼고 팔 쭉</em></b><span>팔꿈치를 펴고 어깨가 손 바로 위에 오게</span></span></div>
+      <div class="tip glass"><span class="n">⏱️</span><span><b>속도 · <em>분당 100~120회</em></b><span>1초에 2번이 조금 안 되는 빠르기</span></span></div>
+      <div class="tip glass"><span class="n">↕️</span><span><b>깊이 · <em>약 5cm</em></b><span>누른 뒤 가슴이 완전히 올라오게 손을 풀기</span></span></div>
+    </div>
+    <button class="btn push" id="startBtn">준비 완료, 시작!</button>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="play">
+    <div class="hud">
+      <button class="x" data-home>✕</button>
+      <div class="prog"><div class="lbl"><span id="modeLbl">리듬 모드</span><span>압박 <b id="cnt">0</b> / 30</span></div><div class="bar"><i id="barFill"></i></div></div>
+    </div>
+    <div class="mon">
+      <div class="row"><div><div class="k">LIVE 속도</div><div class="v"><span id="bpm">--</span><small>회/분</small></div></div><span class="state" id="bstate">탭을 기다리는 중</span></div>
+      <canvas id="ecg"></canvas>
+      <div class="gauge"><i class="needle" id="needle"></i></div>
+      <div class="gscale"><span>느림</span><span>100 ~ 120 적정</span><span>빠름</span></div>
+    </div>
+    <div class="stage">
+      <div class="judge" id="judge"><b></b><span></span></div>
+      <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
+      <div class="target" id="target"><svg class="heart"><use href="#heart"/></svg></div>
+      <div class="count" id="countEl"></div>
+      <div class="combo" id="combo"></div>
+    </div>
+    <div class="hint" id="hint">링이 하트에 <em>딱 겹칠 때</em> 화면 아무 곳이나 탭!</div>
+    <div class="banner glass" id="banner"><b>🎧 가이드 OFF!</b><span>이제 혼자서 분당 100~120회를 유지해요</span></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="result">
+    <div class="res">
+      <div class="rhead glass">
+        <svg class="heart beat" id="rHeart"><use href="#heart"/></svg>
+        <div class="grade" id="rGrade">S</div>
+        <div class="gtitle" id="rTitle"></div>
+        <div class="score"><span id="rScore">0</span><small>점</small></div>
+        <div class="rmsg" id="rMsg"></div>
+        <div class="rname" id="rName"></div>
+      </div>
+      <div class="stats">
+        <div class="stat glass p"><b id="rP">0</b><span>PERFECT</span></div>
+        <div class="stat glass g"><b id="rG">0</b><span>GOOD</span></div>
+        <div class="stat glass m"><b id="rM">0</b><span>MISS</span></div>
+      </div>
+      <div class="metrics glass">
+        <div>평균 압박 속도<b id="rBpm">-</b></div>
+        <div>적정 속도(100~120) 유지<b id="rIn">-</b></div>
+        <div>최대 콤보<b id="rCombo">-</b></div>
+        <div>내 최고 기록<b id="rBest">-</b></div>
+      </div>
+      <div class="facts glass">
+        <h3>💗 꼭 기억해요</h3>
+        <ul>
+          <li><i>1</i><span>반응 확인 → <b>119 신고·AED 요청</b> → 호흡 확인 → 가슴압박</span></li>
+          <li><i>2</i><span><b>분당 100~120회, 깊이 약 5cm</b>, 누른 뒤엔 가슴이 완전히 올라오게</span></li>
+          <li><i>3</i><span>구급대가 오거나 AED가 도착할 때까지 <b>멈추지 않기</b> (여럿이면 2분마다 교대)</span></li>
+        </ul>
+      </div>
+      <div class="rbtns"><button class="btn" id="again">한 번 더 도전</button><button class="btn ghost" data-home>처음으로</button></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const BPM=110, IV=60/BPM, N=30, GUIDE=10, WP=.075, WG=.15, LEAD=IV*2.4;
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let AC=null, G=null, raf=0, mode='rhythm', quizDone=false;
+
+/* ---------- audio ---------- */
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+const lat=()=>Math.min(.25,(AC.outputLatency||0)+(AC.baseLatency||0));
+function tone(t,f,v,d,type,f2,bus){const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(bus||AC.destination);o.start(t);o.stop(t+d+.03)}
+const thump=()=>tone(AC.currentTime,150,.4,.15,'sine',50);
+const chime=()=>{const t=AC.currentTime;tone(t,880,.12,.25);tone(t+.09,1320,.12,.35)};
+const buzz=()=>tone(AC.currentTime,180,.12,.18,'triangle',120);
+const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+
+/* ---------- screens ---------- */
+function show(id){$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id))}
+function goHome(){stopGame();renderBest();show('home')}
+$$('[data-home]').forEach(b=>b.addEventListener('click',goHome));
+function renderBest(){const r=store.get('cpr_best_rhythm'),x=store.get('cpr_best_real');const a=[];if(r!=null)a.push('리듬 '+r+'점');if(x!=null)a.push('실전 '+x+'점');$('#bestTxt').textContent=a.length?'🏆 내 최고 기록 · '+a.join(' / '):''}
+renderBest();
+$('#nick').value=store.get('cpr_nick')||'';
+$$('.mode').forEach(b=>b.addEventListener('click',()=>{ac();mode=b.dataset.mode;store.set('cpr_nick',$('#nick').value.trim());if(quizDone)show('ready');else{buildQuiz();show('quiz')}}));
+
+/* ---------- quiz ---------- */
+const STEPS=[
+  {e:'👋',t:'반응 확인',d:'어깨를 두드리며 "괜찮으세요?"'},
+  {e:'📞',t:'119 신고·AED 요청',d:'"빨간 옷 입은 분, 119에 신고해 주세요!"'},
+  {e:'👀',t:'호흡 확인',d:'가슴이 오르내리는지 10초 안에 확인'},
+  {e:'💗',t:'가슴압박 시작',d:'가슴 정중앙을 강하고 빠르게'}];
+let qNext=0;
+function buildQuiz(){
+  qNext=0;$('#qmsg').textContent='';$('#qNext').classList.add('hide');
+  let o;do{o=[0,1,2,3].sort(()=>Math.random()-.5)}while(o.join()==='0,1,2,3');
+  $('#cards').innerHTML=o.map(i=>`<button class="card glass" data-i="${i}"><span class="no"></span><span class="em">${STEPS[i].e}</span><b>${STEPS[i].t}</b><span>${STEPS[i].d}</span></button>`).join('');
+  $$('.card').forEach(c=>c.addEventListener('click',()=>{
+    if(c.classList.contains('ok'))return;
+    if(+c.dataset.i===qNext){c.classList.add('ok');c.querySelector('.no').textContent=++qNext;tone(AC.currentTime,660+qNext*110,.12,.2);
+      if(qNext===4){quizDone=true;chime();$('#qmsg').textContent='정답! 이 순서, 꼭 기억해요 💗';$('#qNext').classList.remove('hide')}
+      else $('#qmsg').textContent=['','좋아요! 다음은?','잘하고 있어요!','마지막 하나!'][qNext];
+    }else{c.classList.remove('no-go');void c.offsetWidth;c.classList.add('no-go');buzz();vib(60);$('#qmsg').textContent='앗, 그 전에 할 일이 있어요 🤔'}
+  }));
+}
+$('#qNext').addEventListener('click',()=>show('ready'));
+$('#startBtn').addEventListener('click',()=>{ac();startGame()});
+$('#again').addEventListener('click',()=>{ac();startGame()});
+
+/* ---------- ECG ---------- */
+const cv=$('#ecg'),cx=cv.getContext('2d');
+const ECG={buf:[],q:[],last:0,acc:0};
+const TPL=[0,-2,-4,-3,-1,0,0,2,-30,24,5,0,0,0,-4,-7,-8,-6,-3,0];
+function ecgSize(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=Math.max(1,r.width*d);cv.height=Math.max(1,r.height*d);cx.setTransform(d,0,0,d,0,0);ECG.w=r.width;ECG.h=r.height;ECG.buf=new Array(Math.ceil(r.width)).fill(0)}
+addEventListener('resize',ecgSize);
+const ecgKick=()=>ECG.q.push(...TPL);
+function ecgDraw(dt){
+  ECG.acc+=dt*130;let n=ECG.acc|0;ECG.acc-=n;
+  while(n-->0){ECG.buf.shift();ECG.buf.push((ECG.q.length?ECG.q.shift():0)+(Math.random()-.5)*.8)}
+  const{w,h,buf}=ECG,m=h/2;cx.clearRect(0,0,w,h);
+  cx.strokeStyle='rgba(255,255,255,.06)';cx.lineWidth=1;cx.beginPath();for(let x=0;x<w;x+=16){cx.moveTo(x,0);cx.lineTo(x,h)}cx.stroke();
+  const gr=cx.createLinearGradient(0,0,w,0);gr.addColorStop(0,'rgba(255,79,129,0)');gr.addColorStop(.35,'#FF6F9C');gr.addColorStop(1,'#FFC2D6');
+  cx.strokeStyle=gr;cx.lineWidth=2.4;cx.lineJoin='round';cx.shadowColor='#FF4F81';cx.shadowBlur=10;cx.beginPath();
+  buf.forEach((v,x)=>x?cx.lineTo(x,m+v):cx.moveTo(x,m+v));cx.stroke();cx.shadowBlur=0;
+  cx.fillStyle='#fff';cx.beginPath();cx.arc(w-2,m+buf[buf.length-1],3,0,7);cx.fill();
+}
+
+/* ---------- game ---------- */
+const rings=$$('.ring'), tgt=$('#target'), judgeEl=$('#judge'), countEl=$('#countEl');
+function startGame(){
+  stopGame();show('play');ecgSize();
+  const bus=AC.createGain();bus.connect(AC.destination);
+  const s=AC.currentTime+.5, t0=s+3*IV, nb=mode==='rhythm'?N:GUIDE;
+  G={bus,P:0,Gd:0,M:0,n:0,combo:0,max:0,taps:[],last:null,ref:0,solo:false,end:false,beats:[],s,t0,lt:performance.now()};
+  for(let k=0;k<3;k++)tone(s+k*IV-lat(),660,.18,.09,'sine',0,bus);
+  for(let k=0;k<nb;k++){const t=t0+k*IV;G.beats.push({t,j:false,p:false});tone(t-lat(),k%10===0?1180:940,.2,.07,'sine',0,bus)}
+  $('#modeLbl').textContent=mode==='rhythm'?'🎧 리듬 모드':'🔥 실전 모드';
+  $('#hint').innerHTML='링이 하트에 <em>딱 겹칠 때</em> 화면 아무 곳이나 탭!';
+  setJudge('','', '');$('#combo').textContent='';$('#cnt').textContent=0;$('#barFill').style.width=0;
+  $('#bpm').textContent='--';setState('','탭을 기다리는 중');$('#needle').style.left='50%';
+  raf=requestAnimationFrame(loop);
+}
+function stopGame(){cancelAnimationFrame(raf);if(G){G.end=true;try{G.bus.disconnect()}catch(e){}}$('#banner').classList.remove('on')}
+
+function loop(){
+  const now=AC.currentTime,pn=performance.now(),dt=Math.min(.1,(pn-G.lt)/1000);G.lt=pn;
+  // count-in 3·2·1
+  const c=Math.floor((now-G.s)/IV);countEl.textContent=(now>=G.s&&c<3)?3-c:'';
+  // auto-miss + beat pulse
+  for(const b of G.beats){
+    if(!b.p&&now>=b.t){b.p=true;tgt.classList.remove('pulse');void tgt.offsetWidth;tgt.classList.add('pulse')}
+    if(!b.j&&now-b.t>WG){b.j=true;judge('miss','놓쳤어요')}
+  }
+  // rings
+  let r=0;
+  if(!G.solo)for(const b of G.beats){const d=b.t-now;if(d>LEAD||d<-.15||r>=rings.length)continue;
+    const el=rings[r++];el.style.opacity=d<0?Math.max(0,1+d/.15):Math.min(1,(LEAD-d)/(IV*.6));el.style.transform=`scale(${1+Math.max(0,d)/LEAD*1.6})`;
+    el.style.borderColor=Math.abs(d)<=WP?'#B07CFF':'';}
+  while(r<rings.length)rings[r++].style.opacity=0;
+  // solo phase
+  if(mode==='real'&&!G.solo&&G.n>=GUIDE&&G.beats.every(b=>b.j)){G.solo=true;G.ref=now;
+    $('#banner').classList.add('on');setTimeout(()=>$('#banner').classList.remove('on'),1800);
+    $('#hint').innerHTML='가이드 없이 <em>같은 박자</em>로 계속 탭!'}
+  if(G.solo&&!G.end&&G.n<N&&now-G.ref>1.3){G.ref=now;G.last=null;judge('miss','멈추지 마세요!')}
+  ecgDraw(dt);
+  if(G.n>=N&&!G.end){G.end=true;setTimeout(finish,800)}
+  if(!G.end||G.n>=N)raf=requestAnimationFrame(loop);
+}
+
+function tap(){
+  if(!G||G.end||G.n>=N||!$('#play').classList.contains('on'))return;
+  const now=AC.currentTime;thump();vib(12);ecgKick();
+  tgt.classList.add('hit');setTimeout(()=>tgt.classList.remove('hit'),90);
+  G.taps.push(now);liveBpm();
+  if(!G.solo){
+    let best=null,bd=9;for(const b of G.beats)if(!b.j){const d=now-b.t;if(Math.abs(d)<Math.abs(bd)){bd=d;best=b}}
+    G.last=now;
+    if(!best||Math.abs(bd)>IV/2){G.combo=0;$('#combo').textContent='';setJudge('j-miss','앗!',best&&best===G.beats.find(b=>!b.j)&&G.n===0?'첫 박자를 기다려요':'너무 빨라요');return}
+    best.j=true;const a=Math.abs(bd);
+    if(a<=WP)judge('perfect','');else if(a<=WG)judge('good',bd<0?'살짝 빨라요':'살짝 느려요');else judge('miss',bd<0?'빨라요!':'느려요!');
+  }else{
+    G.ref=now;
+    if(G.last==null){G.last=now;setJudge('j-good','GO!','좋아요, 다시 리듬 타기');return}
+    const b=60/(now-G.last);G.last=now;
+    if(b>=100&&b<=120)judge('perfect',Math.round(b)+'회/분');else if(b>=90&&b<=130)judge('good',b<100?'조금 느려요':'조금 빨라요');else judge('miss',b<100?'느려요!':'빨라요!');
+  }
+}
+function judge(k,sub){
+  G.n++;
+  if(k==='perfect'){G.P++;G.combo++}else if(k==='good'){G.Gd++;G.combo++}else{G.M++;G.combo=0}
+  G.max=Math.max(G.max,G.combo);
+  setJudge('j-'+k,{perfect:'PERFECT',good:'GOOD',miss:'MISS'}[k],sub);
+  $('#combo').innerHTML=G.combo>=3?`<b>${G.combo}</b> COMBO`:'';
+  $('#cnt').textContent=Math.min(G.n,N);$('#barFill').style.width=Math.min(100,G.n/N*100)+'%';
+}
+function setJudge(cls,t,s){judgeEl.className='judge '+cls;judgeEl.querySelector('b').textContent=t;judgeEl.querySelector('span').textContent=s;if(t){void judgeEl.offsetWidth;judgeEl.classList.add('pop')}}
+function setState(c,t){const e=$('#bstate');e.className='state '+c;e.textContent=t}
+function intervals(arr){const o=[];for(let i=1;i<arr.length;i++){const d=arr[i]-arr[i-1];if(d>.3&&d<1.5)o.push(d)}return o}
+function liveBpm(){
+  const iv=intervals(G.taps.slice(-5));if(!iv.length)return;
+  const b=Math.round(60/(iv.reduce((a,c)=>a+c,0)/iv.length));$('#bpm').textContent=b;
+  $('#needle').style.left=Math.max(2,Math.min(98,(b-80)/60*100))+'%';
+  b<100?setState('slow','조금 더 빠르게'):b>120?setState('fast','조금 천천히'):setState('good','적정 속도 👍');
+}
+
+/* ---------- result ---------- */
+const GRADES=[[90,'S','골든타임 수호자','완벽한 리듬! 실제 상황에서도 생명을 지킬 수 있어요.'],[75,'A','믿음직한 구조 히어로','아주 좋아요! 조금만 다듬으면 S등급이에요.'],[55,'B','심장이 다시 뛰어요','박자를 잘 따라왔어요. 일정한 속도만 더 연습해 봐요.'],[0,'C','한 번 더 도전!','괜찮아요, 연습이 생명을 살려요. 박자에 집중해 봐요.']];
+function finish(){
+  cancelAnimationFrame(raf);
+  const score=Math.round((G.P+G.Gd*.6)/N*100), g=GRADES.find(x=>score>=x[0]);
+  const iv=intervals(G.taps), avg=iv.length?Math.round(60/(iv.reduce((a,c)=>a+c,0)/iv.length)):null;
+  const inR=iv.length?Math.round(iv.filter(d=>60/d>=100&&60/d<=120).length/iv.length*100):0;
+  const key='cpr_best_'+mode, prev=store.get(key), best=Math.max(prev||0,score);store.set(key,best);
+  $('#rGrade').textContent=g[1];$('#rTitle').textContent=g[2];$('#rMsg').textContent=g[3];
+  $('#rHeart').classList.toggle('dead',score<55);$('#rHeart').classList.toggle('beat',score>=55);
+  $('#rP').textContent=G.P;$('#rG').textContent=G.Gd;$('#rM').textContent=G.M;
+  $('#rBpm').textContent=avg?avg+'회/분':'-';$('#rBpm').className=avg>=100&&avg<=120?'ok':'';
+  $('#rIn').textContent=inR+'%';$('#rIn').className=inR>=70?'ok':'';
+  $('#rCombo').textContent=G.max+'회';$('#rBest').textContent=best+'점'+(prev!=null&&score>prev?' 🎉 NEW':'');
+  const d=new Date(),nick=$('#nick').value.trim();
+  $('#rName').textContent=(nick?nick+' · ':'')+(mode==='rhythm'?'리듬 모드':'실전 모드')+' · '+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate();
+  show('result');$('#result').scrollTop=0;
+  let v=0;const st=performance.now();(function up(t){const p=Math.min(1,(t-st)/900);v=Math.round(score*(1-Math.pow(1-p,3)));$('#rScore').textContent=v;if(p<1)requestAnimationFrame(up)})(st);
+  score>=55?chime():buzz();
+}
+
+/* ---------- input ---------- */
+$('#play').addEventListener('pointerdown',e=>{if(e.target.closest('.x'))return;e.preventDefault();tap()});
+addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat&&$('#play').classList.contains('on')){e.preventDefault();tap()}});
+document.addEventListener('gesturestart',e=>e.preventDefault());
+</script>
+</body>
+</html>
