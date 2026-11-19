@@ -120,7 +120,7 @@ input[type=text]{width:100%;font:inherit;font-size:16px;border:1.5px solid var(-
 <div class="modal" id="mSet"><div class="mbox" style="max-width:720px">
   <button class="x" data-close>×</button>
   <h2>수업 설정</h2>
-  <label class="f">구글 시트 웹 앱 주소 <span class="hint">(Apps Script 배포 후 받은 https://script.google.com/... 주소)</span></label>
+  <label class="f">구글 시트 웹 앱 주소 <span class="hint">(기본값이 들어 있어요. 다른 시트를 쓸 때만 바꾸세요)</span></label>
   <input type="text" id="iApi" placeholder="https://script.google.com/macros/s/.../exec">
   <label class="f">수업 코드 <span class="hint">(학교·반마다 다르게. 예: 광덕고2-3)</span></label>
   <input type="text" id="iCode" placeholder="예) 광덕고2-3">
@@ -155,10 +155,11 @@ const open = id => $("#"+id).classList.add("on");
 
 // ---------- 설정 · QR ----------
 const studentURL = () => location.href.replace(/board\.html.*$/, "").replace(/[?#].*$/, "") + "index.html?c=" + encodeURIComponent(CODE) + "#api=" + encodeURIComponent(API);
-function showQR(){ if (!API || !CODE){ open("mSet"); return; } $("#qr").innerHTML = ""; new QRCode($("#qr"), { text: studentURL(), width: 340, height: 340, correctLevel: QRCode.CorrectLevel.M }); $("#link").textContent = studentURL(); $("#qrCode").textContent = CODE; open("mQr"); }
+function showQR(){ if (!API || !CODE){ openSet(); return; } $("#qr").innerHTML = ""; new QRCode($("#qr"), { text: studentURL(), width: 340, height: 340, correctLevel: QRCode.CorrectLevel.M }); $("#link").textContent = studentURL(); $("#qrCode").textContent = CODE; open("mQr"); }
 $("#qrBtn").onclick = showQR;
-$("#setBtn").onclick = () => { $("#iApi").value = API; $("#iCode").value = CODE; open("mSet"); };
-$("#saveSet").onclick = () => { const a = $("#iApi").value.trim(), c = $("#iCode").value.trim();
+const openSet = () => { $("#iApi").value = API; $("#iCode").value = CODE; open("mSet"); };
+$("#setBtn").onclick = openSet;
+$("#saveSet").onclick = () => { const a = $("#iApi").value.trim() || API, c = $("#iCode").value.trim();
   if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(a)) return alert("구글 Apps Script 웹 앱 주소(https://script.google.com/...)를 붙여넣어 주세요.");
   if (!c) return alert("수업 코드를 적어 주세요."); API = a; CODE = c; ls.set("pqb_api", a); ls.set("pqb_code", c); $("#mSet").classList.remove("on"); head(); load(); showQR(); };
 $("#cpLink").onclick = async () => { try { await navigator.clipboard.writeText(studentURL()); $("#cpLink").textContent = "복사됨!"; } catch(e){} };
@@ -249,7 +250,7 @@ function demo(){
       hunt: { ox: [k%5 ? "O" : "X", k%3 ? "X" : "O", "X", k%4 ? "O" : "X", k%2 ? "X" : "O"] }, fin: { final: "" }, _img: "" }; });
 }
 
-head(); if (!DEMO && (!API || !CODE)) open("mSet"); load(); setInterval(load, 10000);
+head(); if (!DEMO && (!API || !CODE)) openSet(); load(); setInterval(load, 10000);
 </script>
 </body>
 </html>
