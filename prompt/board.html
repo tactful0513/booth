@@ -161,7 +161,7 @@ const openSet = () => { $("#iApi").value = API; $("#iCode").value = CODE; open("
 $("#setBtn").onclick = openSet;
 $("#saveSet").onclick = () => { const a = $("#iApi").value.trim() || API, c = $("#iCode").value.trim();
   if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(a)) return alert("구글 Apps Script 웹 앱 주소(https://script.google.com/...)를 붙여넣어 주세요.");
-  if (!c) return alert("수업 코드를 적어 주세요."); API = a; CODE = c; ls.set("pqb_api", a); ls.set("pqb_code", c); $("#mSet").classList.remove("on"); head(); load(); showQR(); };
+  if (!c) return alert("수업 코드를 적어 주세요."); if (c !== CODE){ ROWS = []; render(); } API = a; CODE = c; ls.set("pqb_api", a); ls.set("pqb_code", c); $("#mSet").classList.remove("on"); head(); load(); showQR(); };
 $("#cpLink").onclick = async () => { try { await navigator.clipboard.writeText(studentURL()); $("#cpLink").textContent = "복사됨!"; } catch(e){} };
 $("#refBtn").onclick = () => load();
 function head(){ $("#code").textContent = "수업 " + (CODE || "미설정") + (DEMO ? " (예시 데이터)" : ""); }
@@ -170,7 +170,9 @@ function head(){ $("#code").textContent = "수업 " + (CODE || "미설정") + (D
 async function load(){
   if (DEMO){ ROWS = demo(); return render(); }
   if (!API || !CODE) return;
-  try { const r = await fetch(API + "?code=" + encodeURIComponent(CODE)); const j = await r.json();
+  const want = CODE;
+  try { const r = await fetch(API + "?code=" + encodeURIComponent(want)); const j = await r.json();
+    if (want !== CODE) return; // 수업 코드가 바뀐 뒤 도착한 이전 수업 응답은 버림
     ROWS = (j.rows||[]).map(x => { try { const s = JSON.parse(x.json); s._img = x.img; return s; } catch(e){ return null; } }).filter(Boolean);
     $("#upd").textContent = "갱신 " + new Date().toLocaleTimeString("ko-KR"); render(); }
   catch(e){ $("#upd").textContent = "불러오기 실패 — 주소·인터넷 확인"; }
@@ -195,16 +197,18 @@ function rStat(){
 
 const SK = () => "pqb_score_" + CODE;
 const MS = ["① 리버스","② 캐릭터","③ 레벨업","④ 헌터","⑤ 쇼케이스"];
+const MK = () => "pqb_teams_" + CODE, getManual = () => { try { return JSON.parse(ls.get(MK()) || "[]"); } catch(e){ return []; } };
 let SC = {}; const loadSC = () => { try { SC = JSON.parse(ls.get(SK()) || "{}"); } catch(e){ SC = {}; } };
 function rScore(){
-  loadSC(); ROWS.forEach(s => { const t = (s.info.team||"").trim(); if (t && !SC[t]) SC[t] = [0,0,0,0,0]; }); ls.set(SK(), JSON.stringify(SC));
-  const teams = Object.keys(SC).sort(teamSort), tot = t => SC[t].reduce((a,b) => a+b, 0);
+  loadSC(); const Z = [0,0,0,0,0];
+  const teams = [...new Set([...ROWS.map(s => (s.info.team||"").trim()).filter(Boolean), ...Object.keys(SC).filter(t => SC[t].some(v => v > 0)), ...getManual()])].sort(teamSort);
+  teams.forEach(t => { if (!SC[t]) SC[t] = [...Z]; }); const tot = t => SC[t].reduce((a,b) => a+b, 0);
   const rk = [...teams].sort((a,b) => tot(b) - tot(a)), medal = t => { const r = rk.indexOf(t); return tot(t) && r < 3 ? ["🥇","🥈","🥉"][r] : ""; };
   $("#tbl").innerHTML = teams.length ? `<tr><th></th>${MS.map(m => `<th>${m}</th>`).join("")}<th>합계</th></tr>` + teams.map(t => `<tr><td><span class="rank">${medal(t)}</span>${esc(t)}</td>${SC[t].map((v,i) => `<td><span class="ctr"><button data-t="${esc(t)}" data-i="${i}" data-d="-1">－</button>${v}<button data-t="${esc(t)}" data-i="${i}" data-d="1">＋</button></span></td>`).join("")}<td class="tot">${tot(t)}</td></tr>`).join("")
     : `<tr><td class="empty" colspan="7">학생이 기록을 보내면 모둠이 자동으로 나타나요</td></tr>`;
 }
-$("#tbl").onclick = e => { const b = e.target.closest("button[data-t]"); if (!b) return; loadSC(); const a = SC[b.dataset.t]; a[+b.dataset.i] = Math.max(0, a[+b.dataset.i] + +b.dataset.d); ls.set(SK(), JSON.stringify(SC)); rScore(); };
-$("#addTeam").onclick = () => { const t = prompt("모둠 이름 (예: 3모둠)"); if (!t) return; loadSC(); SC[t.trim()] ??= [0,0,0,0,0]; ls.set(SK(), JSON.stringify(SC)); rScore(); };
+$("#tbl").onclick = e => { const b = e.target.closest("button[data-t]"); if (!b) return; loadSC(); const a = SC[b.dataset.t] ??= [0,0,0,0,0]; a[+b.dataset.i] = Math.max(0, a[+b.dataset.i] + +b.dataset.d); ls.set(SK(), JSON.stringify(SC)); rScore(); };
+$("#addTeam").onclick = () => { const t = prompt("모둠 이름 (예: 3모둠)"); if (!t) return; const m = getManual(); if (!m.includes(t.trim())) m.push(t.trim()); ls.set(MK(), JSON.stringify(m)); rScore(); };
 $("#clrScore").onclick = () => { if (!confirm("이 수업의 점수를 모두 0으로 돌릴까요?")) return; loadSC(); Object.keys(SC).forEach(k => SC[k] = [0,0,0,0,0]); ls.set(SK(), JSON.stringify(SC)); rScore(); };
 
 const BK = () => "pqb_best_" + CODE; const getBest = () => { try { return JSON.parse(ls.get(BK()) || "[]"); } catch(e){ return []; } };
