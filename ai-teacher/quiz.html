@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>챗봇일까? 에이전트일까?</title>
+<style>
+:root{--b:#0149C3;--g:#14532D;--r:#C0392B;--bg:#F4F6FA;--line:#E2E7F0;--sub:#5B6475}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:var(--bg);color:#1B2333;min-height:100vh;display:flex;justify-content:center}
+main{width:min(520px,100%);padding:18px 16px 30px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--sub)}
+.bar{height:8px;background:#DDE4F0;border-radius:9px;margin:8px 0 18px;overflow:hidden}.bar i{display:block;height:100%;background:var(--b);transition:width .3s}
+.tag{display:inline-block;background:#E8EFFC;color:var(--b);font-weight:700;font-size:13px;border-radius:8px;padding:4px 10px}
+h1{font-size:22px;line-height:1.45;margin:12px 0 18px;word-break:keep-all}
+.opts{display:grid;gap:10px}.opts.two{grid-template-columns:1fr 1fr}
+button{font:inherit;border:2px solid var(--line);background:#fff;border-radius:14px;padding:18px 12px;font-size:18px;font-weight:700;cursor:pointer;color:#1B2333}
+button:active{transform:scale(.98)}button.ok{border-color:var(--g);background:#E7F4EC;color:var(--g)}button.no{border-color:var(--r);background:#FDEDEC;color:var(--r)}
+.ex{margin-top:16px;background:#fff;border-left:5px solid var(--b);border-radius:10px;padding:14px;font-size:15px;line-height:1.6;display:none}
+.next{margin-top:14px;width:100%;background:var(--b);color:#fff;border:0;display:none}
+.end{text-align:center}.end .big{font-size:64px;font-weight:900;color:var(--b);margin:10px 0}
+.start button{width:100%;margin-top:10px}
+</style></head><body><main id="app"></main>
+<script>
+const R1=[["질문하면 답을 화면에 한 번 보여 준다","챗봇","대화창 안에서 답을 주는 것이 기본 AI(챗봇)의 방식이에요."],
+["목표를 주면 계획을 세우고, 파일을 만들고, 결과를 스스로 확인한다","에이전트","계획 → 실행 → 확인을 반복하는 것이 에이전트의 핵심이에요."],
+["만들어 준 글을 내가 복사해서 한글 파일에 붙여 넣어야 한다","챗봇","결과물이 화면 속 텍스트라서 옮기는 일은 사람 몫이에요."],
+["내 컴퓨터 폴더의 엑셀 30개를 열어 한 파일로 합쳐 준다","에이전트","내 컴퓨터의 파일을 직접 읽고 쓰는 것은 에이전트가 할 수 있는 일이에요."],
+["오류가 나면 원인을 찾아 코드를 고치고 다시 실행해 본다","에이전트","스스로 결과를 확인하고 고치는 반복이 에이전트의 힘이에요."],
+["수업 아이디어 10개를 대화창에 적어 준다","챗봇","아이디어 얻기는 챗봇으로도 충분해요."],
+["파일을 지우거나 덮어쓸 수 있어서 권한 관리가 중요하다","에이전트","실제 파일을 다루기 때문에 '지우기 전엔 물어보기' 같은 규칙이 필요해요."],
+["웹앱을 만들어 인터넷에 올리는 과정까지 해낸다","에이전트","파일 생성부터 업로드 준비까지 이어서 하는 것이 에이전트예요."]];
+const R2=[["교육청 연수자료 PDF 5개 안의 내용만 근거로 요약하고 싶다",["NotebookLM","ChatGPT","Copilot","Perplexity"],"NotebookLM은 내가 올린 자료만 근거로 답해요."],
+["항공정비사 자격시험 최신 일정을 출처와 함께 찾고 싶다",["Perplexity","NotebookLM","Claude Code","Copilot"],"Perplexity는 출처 링크를 함께 보여 주는 AI 검색이에요."],
+["반별 엑셀 30개를 합치고 차트가 들어간 파일로 받고 싶다",["Claude Code","ChatGPT","Gemini","NotebookLM"],"여러 파일을 직접 열고 새 파일을 만드는 일은 에이전트(Claude Code) 몫이에요."],
+["수업에 쓸 삽화 이미지를 빠르게 만들고 싶다",["ChatGPT","NotebookLM","Copilot","Perplexity"],"ChatGPT는 대화로 이미지를 만들 수 있어요."],
+["구글 드라이브와 지메일에 흩어진 자료를 정리하고 싶다",["Gemini","Claude","Perplexity","NotebookLM"],"Gemini는 구글 서비스와 연결돼요."],
+["긴 공문 초안을 자연스러운 한국어로 다듬고 싶다",["Claude","Perplexity","Copilot","NotebookLM"],"Claude는 긴 문서 이해와 한국어 글쓰기에 강해요."],
+["지금 열어 둔 엑셀에서 수식 만들기 도움을 받고 싶다",["Copilot","Perplexity","NotebookLM","Gemini"],"Copilot은 윈도우·오피스 안에서 바로 도와줘요."]];
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const Q=[...shuffle(R1).map(([q,a,e])=>({tag:"ROUND 1 · 챗봇일까? 에이전트일까?",q,a,e,o:["챗봇","에이전트"]})),
+         ...shuffle(R2).map(([q,o,e])=>({tag:"ROUND 2 · 이럴 땐 어떤 도구?",q,a:o[0],e,o:shuffle(o)}))];
+const app=document.getElementById("app");let i=0,score=0;
+function start(){app.innerHTML=`<div class="start"><span class="tag">1차시 개념 퀴즈</span><h1>🤖 챗봇일까? 에이전트일까?<br><small style="font-size:16px;color:#5B6475">ROUND 1 개념 8문제 + ROUND 2 도구 고르기 7문제</small></h1><button style="background:#0149C3;color:#fff;border:0" onclick="show()">시작하기</button></div>`}
+function show(){if(i>=Q.length)return end();const q=Q[i];
+app.innerHTML=`<div class="top"><span>${i+1} / ${Q.length}</span><span>점수 ${score}</span></div><div class="bar"><i style="width:${i/Q.length*100}%"></i></div>
+<span class="tag">${q.tag}</span><h1>${q.q}</h1><div class="opts ${q.o.length==2?"two":""}">${q.o.map(o=>`<button>${o}</button>`).join("")}</div>
+<div class="ex"></div><button class="next">다음 ▶</button>`;
+app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{
+ app.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(x.textContent==q.a)x.classList.add("ok")});
+ const ok=b.textContent==q.a;if(ok)score++;else b.classList.add("no");
+ const ex=app.querySelector(".ex");ex.style.display="block";ex.innerHTML=(ok?"⭕ 정답! ":"❌ 정답은 <b>"+q.a+"</b> · ")+q.e;
+ const n=app.querySelector(".next");n.style.display="block";n.onclick=()=>{i++;show()}})}
+function end(){const p=score/Q.length;const t=p>=.9?"AI 에이전트 마스터 🏆":p>=.7?"AI 도구 잘 고르는 선생님 👍":"오늘 연수로 레벨 업 예정 🚀";
+app.innerHTML=`<div class="end"><span class="tag">결과</span><div class="big">${score} / ${Q.length}</div><h1>${t}</h1><button style="width:100%;background:#0149C3;color:#fff;border:0" onclick="location.reload()">다시 하기</button><p style="margin-top:14px"><a href="index.html">← 실습 허브로</a></p></div>`}
+start();
+</script></body></html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>토크·압력 변환기</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:#F4F6FA;color:#1B2333;display:flex;justify-content:center}
+main{width:min(480px,100%);padding:18px 16px 30px}h1{font-size:21px;margin:6px 0 2px}p.s{margin:0 0 14px;color:#5B6475;font-size:14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tabs button{font:inherit;font-size:17px;font-weight:800;padding:14px;border-radius:14px;border:2px solid #D5DDEA;background:#fff;cursor:pointer}
+.tabs button.on{background:#0149C3;color:#fff;border-color:#0149C3}
+.u{background:#fff;border:1px solid #E2E7F0;border-radius:16px;padding:12px 14px;margin:10px 0;display:flex;align-items:center;gap:10px}
+.u input{flex:1;min-width:0;font-size:28px;font-weight:800;border:0;outline:0;background:transparent;color:#0149C3}
+.u b{font-size:18px;width:64px;text-align:right;color:#5B6475}
+.ref{background:#FFF7E6;border:1px solid #F5D9A0;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.7;margin-top:14px}
+a{color:#0149C3}
+</style></head><body><main>
+<h1>🔧 정비 실습 단위 변환기</h1><p class="s">숫자를 아무 칸에나 넣으면 나머지가 바로 바뀌어요</p>
+<div class="tabs"><button data-t="torque" class="on">토크</button><button data-t="press">압력</button></div>
+<div id="box"></div>
+<div class="ref" id="ref"></div>
+<p><a href="index.html">← 실습 허브로</a></p>
+<script>
+// 기준 단위로 바꾸는 계수 (토크: N·m, 압력: kPa)
+const T={torque:{"in-lb":1.3558179483/12,"ft-lb":1.3558179483,"N·m":1},press:{psi:6.894757293,kPa:1,bar:100}};
+const REF={torque:"1 ft-lb = 12 in-lb = 1.356 N·m<br>※ 실제 체결 토크값은 반드시 정비 교범(AMM)을 확인하세요.",
+           press:"대형기 유압 계통 약 3,000 psi ≈ 20,684 kPa ≈ 206.8 bar<br>타이어 공기압 200 psi ≈ 1,379 kPa"};
+let t="torque";const box=document.getElementById("box");
+function draw(){box.innerHTML=Object.keys(T[t]).map(u=>`<label class="u"><input inputmode="decimal" data-u="${u}" placeholder="0"><b>${u}</b></label>`).join("");
+document.getElementById("ref").innerHTML="📌 "+REF[t];
+box.querySelectorAll("input").forEach(inp=>inp.oninput=()=>{const v=parseFloat(inp.value.replace(/,/g,""));
+ box.querySelectorAll("input").forEach(o=>{if(o===inp)return;o.value=isNaN(v)?"":+(v*T[t][inp.dataset.u]/T[t][o.dataset.u]).toFixed(3)})})}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{t=b.dataset.t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));draw()});
+draw();
+</script></main></body></html>

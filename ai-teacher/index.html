@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>교사 AI 에이전트 연수 — 실습 허브</title>
+<style>
+:root{--b:#0149C3;--bg:#F4F6FA;--card:#fff;--line:#E2E7F0;--ink:#1B2333;--sub:#5B6475;--o:#FF6B35;--r:#C0392B}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:var(--b);color:#fff;padding:26px 16px 22px}header div{max-width:860px;margin:auto}
+header h1{margin:0;font-size:22px}header p{margin:6px 0 0;opacity:.85;font-size:14px}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap}
+nav div{max-width:860px;margin:auto;padding:8px 12px}nav a{display:inline-block;padding:8px 14px;margin-right:6px;border-radius:999px;background:var(--bg);color:var(--b);font-weight:700;font-size:14px;text-decoration:none}
+main{max-width:860px;margin:auto;padding:16px}
+section{margin:22px 0 30px}h2{font-size:19px;margin:0 0 4px;display:flex;align-items:center;gap:8px}h2:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--b)}
+.lead{color:var(--sub);font-size:14px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:10px 0}
+.card h3{margin:0 0 8px;font-size:15px}.card h3 span{display:inline-block;background:#E8EFFC;color:var(--b);font-size:12px;border-radius:6px;padding:2px 8px;margin-right:6px}
+pre{white-space:pre-wrap;word-break:keep-all;margin:0;background:#F7F9FC;border:1px dashed #C9D3E6;border-radius:10px;padding:12px;font-size:14px;line-height:1.6;font-family:inherit}
+.row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+button.cp{border:0;background:var(--b);color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer}
+button.cp.ok{background:#14532D}.tip{font-size:13px;color:var(--sub)}
+.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.apps a{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-decoration:none;color:var(--ink)}
+.apps a b{display:block;font-size:16px;color:var(--b)}.apps a small{color:var(--sub)}
+.dl{display:block;text-align:center;background:var(--o);color:#fff;font-weight:800;font-size:17px;border-radius:14px;padding:16px;text-decoration:none}
+.warn{background:#FDEDEC;border:1px solid #F5C6C1;color:#7B241C;border-radius:12px;padding:12px 14px;font-size:14px}
+footer{text-align:center;color:var(--sub);font-size:12px;padding:20px}
+</style></head><body>
+<header><div><h1>교사 AI 에이전트 활용 연수 · 실습 허브</h1><p>Claude Code로 만드는 수업자료 · 수업용 앱 · 업무 자동화 — 요청문을 복사해서 Claude Code에 붙여 넣으세요</p></div></header>
+<nav><div><a href="#s0">준비물</a><a href="#s1">1차시</a><a href="#s2">2차시</a><a href="#s3">3차시</a><a href="#s4">4차시</a><a href="#apps">예시 앱</a></div></nav>
+<main>
+<section id="s0"><h2>실습 예시 파일 받기</h2>
+<p class="lead">교안·엑셀을 못 챙겨 오셨어도 괜찮아요. 아래 파일을 내려받아 압축을 풀고, Claude Code 작업 폴더에 넣으세요.</p>
+<a class="dl" href="실습예시파일.zip" download>⬇ 실습예시파일.zip 내려받기</a>
+<div class="card"><h3>들어 있는 파일</h3><pre>01 예시 교안(항공기 유압 계통).docx · 02 학교 PPT 양식.pptx
+03 실습 평가표(가명).xlsx · 04 구글폼 응답(가명).xlsx · 05 가정통신문 메모.txt
+06 항공기 부품 사진 10장 · 07 행사 사진 10장 · 08 CLAUDE.md 예시</pre></div>
+<div class="warn">⚠ 실제 학생 이름·성적·학교생활기록부는 AI에 그대로 넣지 마세요. 꼭 <b>가명</b>으로 바꾼 뒤 사용합니다.</div>
+</section>
+<div id="cards"></div>
+<section id="apps"><h2>강사가 만든 예시 앱</h2><p class="lead">3차시에 여러분이 만들 앱의 완성 모습이에요. 휴대폰으로 열어 보세요.</p>
+<div class="apps">
+<a href="quiz.html"><b>🤖 챗봇일까? 에이전트일까?</b><small>1차시 · 개념 퀴즈 + 도구 고르기</small></a>
+<a href="phonetic.html"><b>✈ 포네틱 알파벳 퀴즈</b><small>3차시 예시 · 발음 듣기 기능</small></a>
+<a href="convert.html"><b>🔧 토크·압력 변환기</b><small>3차시 예시 · in-lb ↔ N·m, psi ↔ kPa</small></a>
+<a href="../cpr/"><b>❤ CPR 리듬 게임</b><small>다른 수업에서 쓰는 강사 제작 앱</small></a>
+</div></section>
+</main>
+<footer>바로교육연구소 · 교사 AI 에이전트 활용 연수</footer>
+<script>
+const S=[
+{id:"s1",t:"1차시 · AI 이해 + Claude Code 세팅",lead:"설치를 마치면 작업 폴더를 정하고 첫 명령을 내려 봅니다.",c:[
+["첫 명령","다운로드 폴더 정리",`내 다운로드 폴더에 있는 파일을 종류별(문서, 이미지, 압축 파일, 기타)로 하위 폴더를 만들어 정리해 줘.
+옮기기 전에 어떻게 나눌지 목록을 먼저 보여 주고, 내가 "진행"이라고 하면 옮겨 줘. 파일은 절대 지우지 마.`,"Claude가 계획 → 확인 → 실행 순서로 일하는 모습을 관찰해 보세요."],
+["첫 명령","파일 이름 일괄 바꾸기",`07_예시_행사사진 폴더의 사진 이름을 "2026_행사_01.jpg"처럼 순번 형식으로 바꿔 줘.
+바꾸기 전과 후의 이름을 표로 먼저 보여 줘.`,""],
+["업무 설명서","CLAUDE.md 만들기",`나는 강호항공고등학교 항공정비과 교사야. 담당 과목은 [과목명], 대상은 [학년/반]이야.
+문서는 맑은 고딕, 항공 용어는 한글(영문) 함께 표기, 학생 이름은 항상 가명으로 다뤄 줘.
+이 내용을 정리해서 지금 작업 폴더에 CLAUDE.md 파일로 만들어 줘.`,"[ ] 안을 내 정보로 바꿔서 붙여 넣으세요. 08_예시_CLAUDE.md를 참고해도 좋아요."]]},
+{id:"s2",t:"2차시 · 교안 PPT + 구글폼 퀴즈",lead:"교안 파일 하나로 수업 PPT와 자동 채점 퀴즈를 만듭니다.",c:[
+["PPT","교안 → 수업 PPT",`01_예시교안_항공기유압계통.docx를 읽고 2학년 학생용 수업 PPT를 12장 내외로 만들어 줘.
+디자인은 02_예시_학교PPT양식.pptx를 그대로 쓰고 내용만 채워 줘.
+슬라이드 한 장에 글은 5줄 이내, 구성품은 표로 정리하고 마지막 장은 안전 수칙으로 해 줘.`,"내 교안을 쓸 때는 파일 이름만 바꾸면 돼요."],
+["PPT","고쳐 달라고 하기",`5번 슬라이드 글이 너무 많아. 핵심 3줄만 남기고 나머지는 발표자 메모로 옮겨 줘.
+그리고 표지에 비행기 아이콘을 하나 넣어 줘.`,"마음에 들 때까지 말로 고치는 것이 핵심이에요."],
+["구글폼","형성평가 퀴즈 코드 만들기",`같은 교안으로 형성평가 10문항(4지선다, 문항당 1점)을 만들어 줘.
+그리고 이 문항으로 구글폼 퀴즈를 자동으로 만드는 Google Apps Script 코드를 quiz.gs 파일로 써 줘.
+정답과 배점이 설정되게 하고, 맨 앞에 반·번호·이름 입력 칸을 넣어 줘.`,"만든 코드는 script.google.com → 새 프로젝트에 붙여 넣고 ▶실행 → 권한 승인."]]},
+{id:"s3",t:"3차시 · 수업용 웹앱 + GitHub 배포",lead:"주제를 하나 골라 앱을 만들고, 인터넷 주소와 QR 코드까지 만듭니다.",c:[
+["앱 만들기","포네틱 알파벳 퀴즈",`항공 포네틱 알파벳 퀴즈 웹앱을 index.html 파일 하나로 만들어 줘.
+휴대폰 화면에 맞게, 알파벳이 나오면 보기 4개 중 맞는 단어(Alpha, Bravo…)를 고르게 하고
+스피커 버튼을 누르면 영어 발음이 들리게 해 줘. 10문제가 끝나면 점수를 보여 줘.`,""],
+["앱 만들기","부품 이름 맞히기",`06_예시_항공기부품사진 폴더의 사진으로 "항공기 부품 이름 맞히기" 웹앱을 만들어 줘.
+사진이 한 장씩 나오고 보기 4개 중 이름을 고르는 방식, 틀리면 정답과 한 줄 설명을 보여 줘.
+index.html과 사진 폴더만 있으면 돌아가게 해 줘.`,"내가 찍은 실습장 사진으로 바꾸면 우리 학교 전용 앱이 돼요."],
+["앱 만들기","토크·압력 변환기",`정비 실습용 단위 변환기 웹앱을 index.html 하나로 만들어 줘.
+토크(in-lb, ft-lb, N·m)와 압력(psi, kPa, bar)을 숫자만 넣으면 바로 바뀌게, 버튼은 크게.`,""],
+["앱 만들기","FOD·공구 점검 체크리스트",`정비 실습 전후 FOD·공구 점검 체크리스트 웹앱을 만들어 줘.
+항목을 체크하면 진행률이 올라가고, 모두 체크하면 "점검 완료 + 날짜·시간"이 크게 표시되게 해 줘.`,""],
+["배포","GitHub에 올릴 준비",`지금 만든 앱을 GitHub Pages에 올리려고 해.
+올려야 할 파일 목록을 알려 주고, 파일 이름은 index.html로 맞춰 줘.`,"github.com → New repository → Add file → Upload files → Settings → Pages 순서로 진행해요."],
+["배포","QR 코드 만들기",`https://[내아이디].github.io/[저장소이름]/ 주소로 접속하는 QR 코드를 qr.png로 만들어 줘.
+QR 아래에 앱 이름을 크게 적어서, 교실에 붙일 수 있는 A4 안내문(PDF)도 만들어 줘.`,"[ ] 안을 내 GitHub 주소로 바꾸세요."],
+["고치기","친구 피드백 반영",`옆 선생님이 써 보니 휴대폰에서 버튼이 작고, 정답인지 바로 모르겠대.
+버튼을 크게 하고 정답이면 초록색, 오답이면 빨간색으로 표시해 줘.`,""]]},
+{id:"s4",t:"4차시 · 업무 자동화",lead:"평가·설문·안내문처럼 매번 반복하는 일을 맡겨 봅니다.",c:[
+["구글폼 분석","응답 집계표 + 차트",`04_예시_구글폼응답_형성평가(가명).xlsx를 분석해서 새 엑셀 파일로 정리해 줘.
+① 문항별 정답률과 가장 많이 고른 오답 ② 반별 평균·최고·최저 ③ 막대 차트
+정답률 60% 미만 문항은 빨간색으로 표시해 줘.`,"어느 문항, 어느 반이 약한지 결과를 보고 함께 이야기해 봐요."],
+["구글폼 분석","결과보고서 초안",`방금 분석한 결과로 형성평가 결과보고서 초안을 워드 파일 1쪽으로 써 줘.
+격식체로, 결과 요약 → 문항 분석 → 반별 비교 → 보충 지도 계획 순서로.`,""],
+["반복 업무","평가표 반별 분리",`03_예시_실습평가표(가명).xlsx는 세 반이 섞여 있어. 반별 시트로 나누고 번호순으로 정렬해 줘.
+합계와 등급(90점 이상 A, 80 B, 70 C, 나머지 D)을 계산하고, '결시'가 있는 학생은 '재평가'로 표시해 줘.`,""],
+["반복 업무","피드백 문장 초안",`실습 평가 다섯 항목(안전수칙, 공구관리, FOD점검, 토크작업, 보고서)별로
+상·중·하 수준 학생에게 줄 피드백 문장을 2개씩 써 줘. 구체적인 행동을 칭찬하거나 제안하는 문장으로.`,"그대로 쓰지 말고 학생에 맞게 다듬어 쓰세요."],
+["반복 업무","메모 → 가정통신문",`05_예시_가정통신문_메모.txt 내용으로 가정통신문을 워드로 만들어 줘.
+인사말, '아래' 표(일시·장소·준비물·유의사항·제출), 학교장 명의, 절취선 아래 참가 동의서까지.`,""],
+["선택","사진 → 30초 영상",`07_예시_행사사진 폴더 사진 10장으로 30초 슬라이드쇼 영상(mp4)을 만들어 줘.
+사진당 3초, 천천히 확대되는 효과, 첫 장에 "2026 항공정비과 현장체험" 자막을 넣어 줘.`,"영상 프로그램 설치가 필요해서 시간이 걸릴 수 있어요."]]}];
+const box=document.getElementById("cards");
+S.forEach(s=>{const sec=document.createElement("section");sec.id=s.id;
+sec.innerHTML=`<h2>${s.t}</h2><p class="lead">${s.lead}</p>`;
+s.c.forEach(([tag,ttl,txt,tip])=>{const d=document.createElement("div");d.className="card";
+d.innerHTML=`<h3><span>${tag}</span>${ttl}</h3><pre></pre><div class="row"><button class="cp">요청문 복사</button><span class="tip">${tip}</span></div>`;
+d.querySelector("pre").textContent=txt;
+d.querySelector("button").onclick=e=>{const b=e.target;
+(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).catch(()=>{const t=document.createElement("textarea");t.value=txt;document.body.append(t);t.select();document.execCommand("copy");t.remove()})
+.finally(()=>{b.textContent="복사됨 ✓";b.classList.add("ok");setTimeout(()=>{b.textContent="요청문 복사";b.classList.remove("ok")},1500)})};
+sec.append(d)});box.append(sec)});
+</script></body></html>

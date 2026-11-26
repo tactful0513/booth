@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>항공 포네틱 알파벳 퀴즈</title>
+<style>
+:root{--b:#0B2A4A;--y:#F2A900;--g:#14532D;--r:#C0392B}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:linear-gradient(#0B2A4A,#16406B);color:#fff;min-height:100vh;display:flex;justify-content:center}
+main{width:min(480px,100%);padding:18px 16px 30px;text-align:center}
+.top{display:flex;justify-content:space-between;font-size:14px;opacity:.85}
+.mode{display:flex;gap:6px;justify-content:center;margin:12px 0}.mode button{font-size:14px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.mode button.on{background:var(--y);color:#0B2A4A;font-weight:800}
+.card{background:#fff;color:#0B2A4A;border-radius:22px;padding:26px 16px;margin:14px 0}
+.big{font-size:96px;font-weight:900;line-height:1}.hint{font-size:15px;color:#5B6475;margin-top:8px}
+.spk{margin-top:12px;background:var(--y);color:#0B2A4A;border:0;font-size:17px;font-weight:800;border-radius:999px;padding:10px 20px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{font:inherit;font-size:21px;font-weight:800;padding:20px 8px;border-radius:16px;border:0;background:#fff;color:#0B2A4A;cursor:pointer}
+.opts button.ok{background:#2ECC71;color:#fff}.opts button.no{background:var(--r);color:#fff}
+.go{width:100%;margin-top:14px;font-size:19px;font-weight:800;padding:16px;border-radius:16px;border:0;background:var(--y);color:#0B2A4A}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px;color:#0B2A4A;background:#fff;border-radius:12px;overflow:hidden}td{padding:6px;border-bottom:1px solid #eee}
+a{color:#fff}
+</style></head><body><main id="app"></main>
+<script>
+const P=["Alfa","Bravo","Charlie","Delta","Echo","Foxtrot","Golf","Hotel","India","Juliett","Kilo","Lima","Mike","November","Oscar","Papa","Quebec","Romeo","Sierra","Tango","Uniform","Victor","Whiskey","X-ray","Yankee","Zulu"];
+const say=t=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}catch(e){}};
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const app=document.getElementById("app");let mode="see",qs,i,score;
+function home(){app.innerHTML=`<h2 style="margin:8px 0 2px">✈ 항공 포네틱 알파벳 퀴즈</h2><div style="opacity:.8;font-size:14px">조종사·관제사·정비사가 무전으로 쓰는 알파벳</div>
+<div class="mode"><button data-m="see">글자 보고 고르기</button><button data-m="hear">발음 듣고 고르기</button><button data-m="call">호출부호 읽기</button></div>
+<button class="go" onclick="go()">10문제 시작</button>
+<table>${P.map((w,k)=>k%2?"":`<tr><td><b>${w[0]}</b></td><td>${w}</td><td><b>${P[k+1][0]}</b></td><td>${P[k+1]}</td></tr>`).join("")}</table>
+<p><a href="index.html">← 실습 허브로</a></p>`;
+document.querySelectorAll(".mode button").forEach(b=>{b.classList.toggle("on",b.dataset.m==mode);b.onclick=()=>{mode=b.dataset.m;home()}})}
+function go(){i=0;score=0;qs=sh([...P.keys()]).slice(0,10);show()}
+function show(){if(i>=10)return end();const k=qs[i],w=P[k];
+ if(mode=="call"){const L=String.fromCharCode(65+k),cs="HL"+Math.floor(1000+Math.random()*9000)+L;
+  const read=[...cs].map(c=>/\d/.test(c)?["Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Niner"][c]:P[c.charCodeAt(0)-65]);
+  const ans=read[read.length-1],wrong=sh(P.filter(x=>x!=ans)).slice(0,3);
+  render(`<div class="big" style="font-size:54px">${cs}</div><div class="hint">항공기 등록부호 · 마지막 글자 <b>${L}</b>는 무전으로 어떻게 읽을까요?</div>`,ans,sh([ans,...wrong]),()=>say(read.join(" ")));return}
+ const opts=sh([w,...sh(P.filter(x=>x!=w)).slice(0,3)]);
+ if(mode=="hear")render(`<div class="big">🔊</div><div class="hint">발음을 듣고 알맞은 단어를 고르세요</div><button class="spk" onclick="say('${w}')">다시 듣기</button>`,w,opts,null,()=>say(w));
+ else render(`<div class="big">${w[0]}</div><div class="hint">이 글자의 포네틱 단어는?</div><button class="spk" onclick="say('${w}')">🔊 정답 발음 듣기</button>`,w,opts)}
+function render(card,ans,opts,after,first){
+ app.innerHTML=`<div class="top"><span>${i+1} / 10</span><span>점수 ${score}</span></div><div class="card">${card}</div><div class="opts">${opts.map(o=>`<button>${o}</button>`).join("")}</div>`;
+ if(first)setTimeout(first,300);
+ app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{app.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(x.textContent==ans)x.classList.add("ok")});
+  if(b.textContent==ans)score++;else b.classList.add("no");(after||(()=>say(ans)))();setTimeout(()=>{i++;show()},1600)})}
+function end(){app.innerHTML=`<div class="card"><div class="big">${score}<span style="font-size:36px">/10</span></div><div class="hint">${score>=9?"관제탑도 인정하는 교신 실력!":score>=6?"조금만 더 연습하면 완벽해요":"표를 보고 한 번 더 도전!"}</div></div><button class="go" onclick="go()">다시 하기</button><button class="go" style="background:#fff" onclick="home()">처음으로</button>`}
+home();
+</script></body></html>
