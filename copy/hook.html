@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>훅 문구 공방</title><link rel="stylesheet" href="s.css">
+<style>
+.f{border-left:6px solid var(--b);background:#fff;border-radius:12px;padding:10px 12px;margin:8px 0}
+.f b{color:var(--b)}.f p{margin:4px 0 0;font-size:14px;color:var(--sub)}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.objs button{background:#fff;border:2px solid var(--line);border-radius:14px;padding:6px;font-size:13px;font-weight:700}
+.objs button img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
+.objs button.on{border-color:var(--o);box-shadow:0 0 0 3px #FFD9C7}
+.cp{display:grid;grid-template-columns:120px 1fr 40px;gap:6px;margin:8px 0}
+.cp select{font-size:14px;padding:8px}.cp button{border:0;background:#EEF1F6;border-radius:10px;font-size:20px}
+.cp button.on{background:var(--y)}
+.price{display:flex;gap:8px;align-items:center}.price input{font-size:22px;font-weight:900;color:var(--o)}
+#sale{background:#fff;border-radius:24px;max-width:620px;width:100%;padding:22px;text-align:center;color:var(--ink)}
+#sale img{width:62%;max-width:300px}#sale .nm{font-size:20px;font-weight:800;color:var(--b)}
+#sale .hd{font-size:32px;font-weight:900;line-height:1.35;margin:10px 0}
+#sale .pr{display:inline-block;background:var(--o);color:#fff;font-size:30px;font-weight:900;border-radius:999px;padding:8px 26px}
+#sale .sub{color:var(--sub);font-size:15px;margin-top:10px}
+</style></head><body>
+<header><div><a href="index.html">← 카피 연구소</a><h1>🪝 훅 문구 공방</h1><p>2교시 · 엉뚱한 물건을 비싸게 팔아라!</p></div></header>
+<main>
+<h2><b>1</b>3초를 잡는 카피 공식 5가지</h2>
+<div class="f"><b>① 단점 → 장점 뒤집기</b><p>“우리는 2등입니다. 그래서 더 열심히 합니다.” (에이비스)</p></div>
+<div class="f"><b>② 숫자로 콕</b><p>“3분 카레”, “비타500”, “2% 부족할 때”</p></div>
+<div class="f"><b>③ 질문 던지기</b><p>“니들이 게 맛을 알아?”</p></div>
+<div class="f"><b>④ 반전 · 낯설게</b><p>“침대는 가구가 아닙니다. 과학입니다.”</p></div>
+<div class="f"><b>⑤ 리듬 · 반복</b><p>“손이 가요 손이 가 새우깡에 손이 가요”</p></div>
+
+<h2><b>2</b>우리 모둠의 엉뚱한 물건</h2>
+<p class="lead">선생님이 정해 준 물건을 고르거나 🎲를 눌러 뽑으세요.</p>
+<div class="objs" id="objs"></div>
+<button class="btn o full" id="pick">🎲 물건 뽑기</button>
+
+<h2><b>3</b>공식을 넣어 카피 3개 쓰기</h2>
+<div class="card">
+<label>새 상품 이름 (멋지게 지어 주세요)</label><input id="nm" placeholder="예: 에어홀 쿨링 삭스">
+<label>카피 3개 — ⭐를 눌러 대표 카피를 고르세요</label>
+<div id="cps"></div>
+<label>판매 가격</label><div class="price"><input id="pr" inputmode="numeric" placeholder="예: 39000"><b>원</b></div>
+<label>이 가격인 이유 (한 줄)</label><input id="rs" placeholder="예: 세계 최초 엄지발가락 환기 시스템 탑재">
+<div class="ex">💡 구멍 난 양말 예시 — ① “구멍이 아닙니다. 발가락 전용 창문입니다.” ② “구멍 1개, 시원함 100%” ③ “아직도 땀 찬 양말 신니?”</div>
+<button class="btn full" id="show">📣 판매 카드 띄우기 (발표용)</button>
+</div>
+</main>
+<div class="overlay" id="ov"><div id="sale"></div></div>
+<footer>바로교육연구소 · 카피 연구소</footer>
+<script>
+const O=[["o_sock","구멍 난 양말"],["o_glove","한 짝뿐인 장갑"],["o_icecream","다 녹은 아이스크림"],["o_umbrella","뒤집힌 우산"],["o_mug","이 빠진 머그컵"],["o_clock","멈춘 알람시계"]];
+const F=["단점→장점","숫자로 콕","질문 던지기","반전·낯설게","리듬·반복"];
+const $=id=>document.getElementById(id),K="copy_hook";let st={};try{st=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
+st.c=st.c||[["",F[0]],["",F[1]],["",F[3]]];st.best=st.best??0;
+function objs(){$("objs").innerHTML=O.map(([k,n],i)=>`<button data-i="${i}" class="${st.o==i?"on":""}"><img src="img/${k}.jpg" alt="">${n}</button>`).join("");
+ $("objs").querySelectorAll("button").forEach(b=>b.onclick=()=>{st.o=+b.dataset.i;save();objs()})}
+objs();
+$("pick").onclick=()=>{let n=0;const t=setInterval(()=>{st.o=Math.random()*O.length|0;objs();if(++n>12){clearInterval(t);save()}},90)};
+function cps(){$("cps").innerHTML=st.c.map((c,i)=>`<div class="cp"><select data-i="${i}">${F.map(f=>`<option ${f==c[1]?"selected":""}>${f}</option>`).join("")}</select>
+ <input data-i="${i}" value="${(c[0]||"").replace(/"/g,"&quot;")}" placeholder="카피 ${i+1}"><button data-i="${i}" class="${st.best==i?"on":""}">⭐</button></div>`).join("");
+ $("cps").querySelectorAll("select").forEach(e=>e.onchange=()=>{st.c[e.dataset.i][1]=e.value;save()});
+ $("cps").querySelectorAll("input").forEach(e=>e.oninput=()=>{st.c[e.dataset.i][0]=e.value;save()});
+ $("cps").querySelectorAll("button").forEach(e=>e.onclick=()=>{st.best=+e.dataset.i;save();cps()})}
+cps();
+["nm","pr","rs"].forEach(k=>{$(k).value=st[k]||"";$(k).oninput=()=>{st[k]=$(k).value;save()}});
+const esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"})[c]);
+$("show").onclick=()=>{const o=O[st.o??0],c=st.c[st.best]||["",""],p=parseInt((st.pr||"").replace(/\D/g,""))||0;let team="";try{team=localStorage.getItem("copy_team")||""}catch(e){}
+ $("sale").innerHTML=`<img src="img/${o[0]}.jpg" alt=""><div class="nm">${esc(st.nm)||o[1]}</div><div class="hd">“${esc(c[0])||"대표 카피를 써 주세요"}”</div>
+ <div class="pr">${p?p.toLocaleString()+"원":"가격 미정"}</div><div class="sub">${esc(st.rs)}<br><small>${esc(team)} · 사용한 공식: ${c[1]}</small></div>`;$("ov").classList.add("on")};
+$("ov").onclick=()=>$("ov").classList.remove("on");
+</script></body></html>

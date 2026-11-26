@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>스토리 뼈대 활동지</title><link rel="stylesheet" href="s.css">
+<style>
+.roul{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.roul div{background:#E8EFFC;border-radius:14px;padding:12px;text-align:center}
+.roul small{display:block;color:var(--sub);font-size:12px;font-weight:700}
+.roul b{display:block;font-size:20px;color:var(--b);min-height:30px}
+.bone{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start;margin-top:8px}
+.bone span{background:var(--b);color:#fff;font-weight:800;border-radius:10px;padding:10px 0;text-align:center;font-size:14px}
+.bone span.o{background:var(--o)}
+#card{background:#fff;border-radius:20px;padding:22px;max-width:560px;width:100%;color:var(--ink)}
+#card h3{margin:0 0 4px;color:var(--o);font-size:15px}#card .cp{font-size:28px;font-weight:900;line-height:1.35;margin:8px 0 14px}
+#card table{width:100%;border-collapse:collapse;font-size:15px}#card td{padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}#card td:first-child{width:72px;font-weight:800;color:var(--b)}
+</style></head><body>
+<header><div><a href="index.html">← 카피 연구소</a><h1>📖 스토리 뼈대 활동지</h1><p>1교시 · 기억에 남는 단 한 줄의 힘</p></div></header>
+<main>
+<h2><b>1</b>내 머릿속을 맴도는 광고</h2>
+<div class="card">
+<label>어떤 광고(제품)인가요?</label><input id="ad" placeholder="예: ○○ 과자 광고">
+<label>머릿속에 남은 노래·대사(카피)</label><input id="adcopy" placeholder="예: 손이 가요 손이 가~">
+<label>왜 기억에 남았을까? (여러 개 골라도 돼요)</label>
+<div class="chips" id="why"></div>
+</div>
+
+<h2><b>2</b>타깃 룰렛 — 누구에게 팔까?</h2>
+<p class="lead">같은 물건도 <b>누구에게</b> 파느냐에 따라 이야기가 완전히 달라져요.</p>
+<div class="card">
+<div class="roul"><div><small>팔 물건</small><b id="pd">?</b></div><div><small>주인공(타깃)</small><b id="tg">?</b></div></div>
+<button class="btn o full" id="spin">🎰 룰렛 돌리기</button>
+<p class="tip">마음에 안 들면 다시 돌려도 돼요. 직접 정하고 싶으면 아래 칸에 바로 써도 OK!</p>
+</div>
+
+<h2><b>3</b>스토리텔링 뼈대 세우기</h2>
+<div class="card">
+<div class="bone"><span>주인공</span><input id="s1" placeholder="누구의 이야기인가요?"></div>
+<div class="bone"><span>고민</span><textarea id="s2" placeholder="주인공은 어떤 문제·불편 때문에 힘든가요? (기·승)"></textarea></div>
+<div class="bone"><span>해결</span><textarea id="s3" placeholder="우리 물건이 어떻게 도와주나요? (전)"></textarea></div>
+<div class="bone"><span>변화</span><textarea id="s4" placeholder="그래서 주인공은 어떻게 달라졌나요? (결)"></textarea></div>
+<div class="bone"><span class="o">한 줄</span><input id="s5" placeholder="이 이야기를 한 줄 카피로!"></div>
+<div class="ex">💡 예시 (경동보일러) — 주인공: 도시에 사는 부부 / 고민: 시골 아버님 댁이 겨울마다 춥다 / 해결: 보일러를 놔 드린다 / 변화: 마음 편한 효도 / 한 줄: “여보, 아버님 댁에 보일러 놔드려야겠어요”</div>
+<button class="btn full" id="show">🪪 발표 카드로 보기</button>
+</div>
+</main>
+<div class="overlay" id="ov"><div id="card"></div></div>
+<footer>바로교육연구소 · 카피 연구소</footer>
+<script>
+const P=["초코 과자","생수","운동화","우산","필통","컵라면","이어폰","목도리"];
+const T=["시험 기간 중학생","손주 보러 가는 할머니","새벽 운동하는 아빠","축구부 주장","처음 전학 온 학생","강아지 키우는 가족","야근하는 회사원","수학여행 가는 반"];
+const W=["노래·리듬","웃겨서","반전","숫자","공감·감동","모델이 좋아서","자꾸 나와서"];
+const $=id=>document.getElementById(id),K="copy_story",ids=["ad","adcopy","s1","s2","s3","s4","s5"];
+let st={};try{st=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
+ids.forEach(k=>{$(k).value=st[k]||"";$(k).oninput=()=>{st[k]=$(k).value;save()}});
+st.why=st.why||[];$("why").innerHTML=W.map(w=>`<button class="${st.why.includes(w)?"on":""}">${w}</button>`).join("");
+$("why").querySelectorAll("button").forEach(b=>b.onclick=()=>{b.classList.toggle("on");st.why=[...$("why").querySelectorAll(".on")].map(x=>x.textContent);save()});
+if(st.pd){$("pd").textContent=st.pd;$("tg").textContent=st.tg}
+$("spin").onclick=()=>{let n=0;const t=setInterval(()=>{$("pd").textContent=P[Math.random()*P.length|0];$("tg").textContent=T[Math.random()*T.length|0];
+ if(++n>14){clearInterval(t);st.pd=$("pd").textContent;st.tg=$("tg").textContent;if(!$("s1").value){$("s1").value=st.tg;st.s1=st.tg}save()}},70)};
+const esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"})[c]);
+$("show").onclick=()=>{let team="";try{team=localStorage.getItem("copy_team")||""}catch(e){}
+ $("card").innerHTML=`<h3>${esc(team)||"우리 모둠"} · ${esc(st.pd||"우리 물건")} 이야기</h3><div class="cp">“${esc(st.s5)||"한 줄 카피를 써 주세요"}”</div>
+ <table><tr><td>주인공</td><td>${esc(st.s1)}</td></tr><tr><td>고민</td><td>${esc(st.s2)}</td></tr><tr><td>해결</td><td>${esc(st.s3)}</td></tr><tr><td>변화</td><td>${esc(st.s4)}</td></tr></table>
+ <p class="tip" style="margin-top:12px">화면을 누르면 닫혀요 · 캡처해서 보관하세요</p>`;$("ov").classList.add("on")};
+$("ov").onclick=()=>$("ov").classList.remove("on");
+</script></body></html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>카피 연구소 — 마음을 여는 3초의 마법</title><link rel="stylesheet" href="s.css">
+<style>
+.go{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;text-decoration:none;color:var(--ink)}
+.go .n{flex:none;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:28px;background:#E8EFFC}
+.go b{display:block;font-size:17px;color:var(--b)}.go small{color:var(--sub);font-size:13px}
+.go.t .n{background:#FFF1E8}
+</style></head><body>
+<header><div><h1>✏️ 카피 연구소</h1><p>마음을 여는 3초의 마법 · 스토리텔링과 카피라이팅</p></div></header>
+<main>
+<div class="card">
+<label for="team">우리 모둠 이름 (또는 내 이름)</label>
+<input id="team" placeholder="예: 3모둠 카피천재들" maxlength="20">
+<p class="tip">한 번 적으면 모든 활동에 자동으로 들어가요. 이 기기에만 저장돼요.</p>
+</div>
+<a class="go" href="quiz.html"><span class="n">🎯</span><span><b>도입 · 3초 카피 퀴즈</b><small>빈칸 채우기 + 어떤 공식일까?</small></span></a>
+<a class="go" href="story.html"><span class="n">📖</span><span><b>1교시 · 스토리 뼈대 활동지</b><small>내 머릿속 광고 + 타깃 룰렛</small></span></a>
+<a class="go" href="hook.html"><span class="n">🪝</span><span><b>2교시 · 훅 문구 공방</b><small>엉뚱한 물건을 비싸게 팔아라!</small></span></a>
+<a class="go" href="poster.html"><span class="n">📢</span><span><b>4교시 · 캠페인 포스터 메이커</b><small>우리 학교를 바꾸는 한 줄 → 포스터 저장</small></span></a>
+<a class="go t" href="score.html"><span class="n">🏆</span><span><b>선생님용 · 품평회 점수판</b><small>모둠별 점수·낙찰가를 큰 화면에</small></span></a>
+</main>
+<footer>바로교육연구소 · 진로 교육 「마음을 여는 3초의 마법」</footer>
+<script>
+const t=document.getElementById("team");try{t.value=localStorage.getItem("copy_team")||""}catch(e){}
+t.oninput=()=>{try{localStorage.setItem("copy_team",t.value.trim())}catch(e){}};
+</script></body></html>

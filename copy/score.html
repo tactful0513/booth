@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>품평회 점수판</title><link rel="stylesheet" href="s.css">
+<style>
+body{background:#0B2E7A;color:#fff}main{max-width:1100px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.bar .btn{padding:9px 14px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.t{background:#fff;color:var(--ink);border-radius:18px;padding:14px;position:relative}
+.t input{font-weight:900;font-size:18px;padding:6px 8px;border:0;border-bottom:2px dashed #CBD5E4;border-radius:0}
+.t .rank{position:absolute;right:12px;top:10px;font-size:28px}
+.s{display:flex;justify-content:space-between;align-items:center;margin:8px 0;font-weight:700;font-size:15px}
+.s div{display:flex;gap:6px;align-items:center}.s button{width:34px;height:34px;border-radius:10px;border:0;font-size:20px;font-weight:900;background:#EEF1F6}
+.s button.p{background:var(--b);color:#fff}.s b{min-width:26px;text-align:center;font-size:20px}
+.tot{font-size:26px;font-weight:900;color:var(--o);text-align:right}
+.bid{display:flex;gap:6px;align-items:center;font-weight:700}.bid input{font-size:16px;border:1.5px solid #CBD5E4;border-radius:10px}
+.t.top{box-shadow:0 0 0 5px var(--y)}
+</style></head><body>
+<header style="background:#071F55"><div style="max-width:1100px"><a href="index.html">← 카피 연구소</a><h1>🏆 우리들의 품평회 점수판</h1><p>멈춤력 · 공식 활용 · 웃음(창의) 점수 + “얼마에 살래?” 낙찰가</p></div></header>
+<main>
+<div class="bar"><button class="btn o" id="add">+ 모둠 추가</button><button class="btn w" id="del">− 마지막 모둠 빼기</button><button class="btn w" id="reset">점수 초기화</button>
+<span class="tip" style="color:#C9D6F2">점수는 이 기기(선생님 PC)에만 저장돼요</span></div>
+<div class="grid" id="g"></div>
+</main>
+<script>
+const C=["3초 멈춤력","공식 활용","웃음·창의"],K="copy_score",$=id=>document.getElementById(id);
+let T;try{T=JSON.parse(localStorage.getItem(K))}catch(e){}
+T=T||[1,2,3,4,5,6].map(n=>({n:n+"모둠",s:[0,0,0],b:""}));
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(T))}catch(e){}};
+const tot=t=>t.s.reduce((a,b)=>a+b,0);
+function draw(){const order=[...T].map((t,i)=>[tot(t),i]).sort((a,b)=>b[0]-a[0]),rk={};order.forEach(([v,i],k)=>rk[i]=v?["🥇","🥈","🥉"][k]||"":"");
+ const mx=Math.max(...T.map(tot));
+ $("g").innerHTML=T.map((t,i)=>`<div class="t ${mx&&tot(t)==mx?"top":""}"><span class="rank">${rk[i]}</span><input data-i="${i}" value="${t.n.replace(/"/g,"&quot;")}">
+ ${C.map((c,j)=>`<div class="s">${c}<div><button data-i="${i}" data-j="${j}" data-d="-1">−</button><b>${t.s[j]}</b><button class="p" data-i="${i}" data-j="${j}" data-d="1">+</button></div></div>`).join("")}
+ <div class="bid">💰 낙찰가 <input data-b="${i}" value="${t.b}" placeholder="예: 3만 원"></div><div class="tot">${tot(t)}점</div></div>`).join("");
+ $("g").querySelectorAll("button").forEach(b=>b.onclick=()=>{const t=T[b.dataset.i];t.s[b.dataset.j]=Math.max(0,t.s[b.dataset.j]+ +b.dataset.d);save();draw()});
+ $("g").querySelectorAll("input[data-i]").forEach(e=>e.onchange=()=>{T[e.dataset.i].n=e.value;save()});
+ $("g").querySelectorAll("input[data-b]").forEach(e=>e.onchange=()=>{T[e.dataset.b].b=e.value;save()})}
+$("add").onclick=()=>{T.push({n:(T.length+1)+"모둠",s:[0,0,0],b:""});save();draw()};
+$("del").onclick=()=>{if(T.length>1&&confirm("마지막 모둠을 뺄까요?")){T.pop();save();draw()}};
+$("reset").onclick=()=>{if(confirm("모든 점수와 낙찰가를 지울까요?")){T.forEach(t=>{t.s=[0,0,0];t.b=""});save();draw()}};
+draw();
+</script></body></html>

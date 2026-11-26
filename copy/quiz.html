@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3초 카피 퀴즈</title><link rel="stylesheet" href="s.css">
+<style>
+body{background:linear-gradient(#1554CA,#0B2E7A);min-height:100vh;color:#fff}
+main{text-align:center}
+.top{display:flex;justify-content:space-between;font-size:15px;opacity:.85;margin-top:6px}
+.q{background:#fff;color:var(--ink);border-radius:22px;padding:26px 18px;margin:14px 0}
+.q .k{display:inline-block;background:#FFF1E8;color:var(--o);font-weight:800;font-size:13px;border-radius:999px;padding:4px 12px}
+.q .c{font-size:28px;font-weight:900;line-height:1.4;margin:14px 0 4px}
+.q .c u{text-decoration:none;display:inline-block;min-width:3.2em;border-bottom:4px solid var(--o);color:var(--o)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{font-size:19px;font-weight:800;padding:18px 8px;border-radius:16px;border:0;background:#fff;color:var(--ink)}
+.opts button.ok{background:#2ECC71;color:#fff}.opts button.no{background:var(--r);color:#fff}
+.why{background:rgba(255,255,255,.12);border-radius:14px;padding:12px;margin-top:12px;font-size:15px;text-align:left;display:none}
+.why.on{display:block}
+.big{font-size:86px;font-weight:900;line-height:1}
+.start .btn{margin:6px}
+</style></head><body>
+<main id="app"></main>
+<script>
+// [카피(빈칸은 __), 정답, 오답3, 브랜드, 공식]
+const R1=[
+["침대는 가구가 아닙니다. __입니다.","과학",["예술","사랑","휴식"],"에이스침대","반전·낯설게 — 모두가 아는 사실을 뒤집어 '어? 뭐지?' 하게 만들어요."],
+["니들이 __ 맛을 알아?","게",["김치","라면","치킨"],"롯데리아 크랩버거","질문 던지기 — 질문을 받으면 머릿속으로 대답하게 돼요."],
+["손이 가요 손이 가 __에 손이 가요","새우깡",["감자깡","꼬깔콘","양파링"],"농심 새우깡","리듬·반복 — 노래처럼 반복되면 머릿속을 맴돌아요."],
+["여보, 아버님 댁에 __ 놔드려야겠어요","보일러",["에어컨","안마의자","정수기"],"경동보일러","이야기(스토리) — 부부의 대화 한 장면으로 '효도'를 떠올리게 해요."],
+["2% __ 때","부족할",["넘칠","행복할","목마를"],"롯데칠성 음료","숫자로 콕 — 숫자가 들어가면 구체적이고 눈에 띄어요."],
+["사나이 울리는 __","신라면",["짜장면","냉면","떡볶이"],"농심 신라면","리듬·반복 — '울리는/신라면' 소리가 착 붙어요."],
+["비타 __","500",["100","1000","700"],"광동제약","숫자로 콕 — 이름 자체에 숫자(비타민C 500mg)를 넣었어요."]];
+const F=["단점→장점","숫자로 콕","질문 던지기","반전·낯설게","리듬·반복"];
+const R2=[
+["우리는 2등입니다. 그래서 더 열심히 합니다.","단점→장점","렌터카 회사 에이비스(Avis) — 1등이 아니라는 약점을 '더 노력한다'는 장점으로 바꿨어요."],
+["3분이면 OK! 3분 카레","숫자로 콕","오뚜기 3분 카레 — 시간을 숫자로 딱 보여 줬어요."],
+["니들이 게 맛을 알아?","질문 던지기","질문을 받으면 '나는 아는데?' 하고 대답하고 싶어져요."],
+["침대는 가구가 아닙니다. 과학입니다.","반전·낯설게","당연한 생각(침대=가구)을 깨서 눈길을 잡아요."],
+["작게 생각하라 (Think small)","단점→장점","폭스바겐 비틀 — '작다'는 약점을 '실속 있다'는 장점으로!"],
+["손이 가요 손이 가 새우깡에 손이 가요","리듬·반복","반복되는 노랫말은 한 번 들으면 잊기 어려워요."]];
+const app=document.getElementById("app"),sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+let round,qs,i,score;
+function home(){app.innerHTML=`<h1 style="margin:24px 0 4px">🎯 3초 카피 퀴즈</h1><p style="opacity:.85">광고 속 한 줄, 얼마나 기억하나요?</p>
+<div class="q start"><div class="big">3초</div><p>문제를 보고 3초 안에 떠올려 보세요!</p>
+<button class="btn o" onclick="go(1)">1라운드 · 빈칸 채우기</button><button class="btn" onclick="go(2)">2라운드 · 어떤 공식일까?</button></div>
+<p><a href="index.html" style="color:#fff">← 카피 연구소로</a></p>`}
+function go(r){round=r;i=0;score=0;qs=r==1?sh(R1):sh(R2);show()}
+function show(){if(i>=qs.length)return end();const q=qs[i];let card,ans,opts,why;
+ if(round==1){card=`<span class="k">빈칸 채우기</span><div class="c">“${q[0].replace("__","<u>?</u>")}”</div>`;ans=q[1];opts=sh([q[1],...q[2]]);why=`<b>정답: ${q[1]}</b> (${q[3]})<br>📌 ${q[4]}`}
+ else{card=`<span class="k">이 카피에 쓰인 공식은?</span><div class="c" style="font-size:24px">“${q[0]}”</div>`;ans=q[1];opts=F.slice(0,5);why=`<b>정답: ${q[1]}</b><br>📌 ${q[2]}`}
+ app.innerHTML=`<div class="top"><span>${round}라운드 · ${i+1} / ${qs.length}</span><span>점수 ${score}</span></div><div class="q">${card}</div>
+ <div class="opts">${opts.map(o=>`<button>${o}</button>`).join("")}</div><div class="why" id="why">${why}</div>`;
+ app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{app.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(x.textContent==ans)x.classList.add("ok")});
+  if(b.textContent==ans)score++;else b.classList.add("no");const w=document.getElementById("why");w.classList.add("on");
+  w.insertAdjacentHTML("beforeend",`<button class="btn full o" id="nx">다음 ▶</button>`);document.getElementById("nx").onclick=()=>{i++;show()}})}
+function end(){app.innerHTML=`<div class="q"><div class="big">${score}<span style="font-size:34px">/${qs.length}</span></div>
+<p style="font-size:18px;font-weight:800">${score>=qs.length-1?"이미 카피라이터의 눈을 가졌네요!":score>=qs.length/2?"광고를 꽤 눈여겨봤군요!":"오늘 수업이 끝나면 완전히 달라질 거예요!"}</p>
+<button class="btn o" onclick="go(${round})">다시 하기</button> <button class="btn" onclick="go(${round==1?2:1})">${round==1?2:1}라운드 하기</button></div>
+<p><a href="index.html" style="color:#fff">← 카피 연구소로</a></p>`}
+home();
+</script></body></html>

@@ -1,0 +1,26 @@
+:root{--b:#1554CA;--bg:#F4F6FA;--line:#E2E7F0;--ink:#1B2333;--sub:#5B6475;--o:#FF6B35;--y:#FFC93C;--g:#14A06F;--r:#E03B3B}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Pretendard,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;word-break:keep-all}
+header{background:var(--b);color:#fff;padding:18px 16px 16px}
+header div{max-width:720px;margin:auto}header h1{margin:0;font-size:21px}header p{margin:4px 0 0;opacity:.85;font-size:14px}
+header a{color:#fff;font-size:13px;opacity:.85}
+main{max-width:720px;margin:auto;padding:14px 16px 40px}
+h2{font-size:18px;margin:22px 0 6px;display:flex;align-items:center;gap:8px}
+h2 b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--o);color:#fff;font-size:14px}
+.lead{color:var(--sub);font-size:14px;margin:0 0 10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+label{display:block;font-weight:700;font-size:14px;margin:10px 0 4px}
+input,textarea,select{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1.5px solid #CBD5E4;border-radius:10px;background:#fff}
+textarea{min-height:64px;resize:vertical}
+button{font:inherit;cursor:pointer}
+.btn{display:inline-block;border:0;background:var(--b);color:#fff;font-weight:800;font-size:16px;border-radius:12px;padding:12px 18px;text-decoration:none;text-align:center}
+.btn.o{background:var(--o)}.btn.g{background:var(--g)}.btn.w{background:#fff;color:var(--b);border:1.5px solid var(--b)}
+.btn.full{display:block;width:100%;margin-top:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1.5px solid #CBD5E4;background:#fff;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:700;color:var(--sub)}
+.chips button.on{background:var(--b);border-color:var(--b);color:#fff}
+.tip{font-size:13px;color:var(--sub)}
+.ex{background:#FFF8E1;border:1px dashed #F2C35B;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:8px}
+footer{text-align:center;color:var(--sub);font-size:12px;padding:16px}
+.overlay{position:fixed;inset:0;background:rgba(10,20,40,.92);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.overlay.on{display:flex}

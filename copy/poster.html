@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캠페인 포스터 메이커</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="s.css">
+<style>
+.wrap{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:900px){main{max-width:1100px}.wrap{grid-template-columns:1fr 420px;align-items:start}.pv{position:sticky;top:10px}}
+canvas{width:100%;height:auto;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.15);background:#fff;display:block}
+.topics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.topics button{background:#fff;border:2px solid var(--line);border-radius:12px;padding:5px;font-size:12.5px;font-weight:800;color:var(--ink)}
+.topics button img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block;margin-bottom:3px}
+.topics button.on{border-color:var(--o);box-shadow:0 0 0 3px #FFD9C7}
+.sw{display:flex;gap:8px}.sw button{width:42px;height:42px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px #CBD5E4}
+.sw button.on{box-shadow:0 0 0 3px var(--ink)}
+</style></head><body>
+<header><div style="max-width:1100px"><a href="index.html">← 카피 연구소</a><h1>📢 캠페인 포스터 메이커</h1><p>4교시 · 우리 학교를 바꾸는 한 줄</p></div></header>
+<main><div class="wrap"><div>
+<h2><b>1</b>캠페인 주제 고르기</h2>
+<div class="topics" id="topics"></div>
+
+<h2><b>2</b>카피 쓰기</h2>
+<div class="card">
+<label>슬로건 (헤드 카피) — 강조할 말은 [대괄호]로!</label>
+<input id="hd" maxlength="40">
+<p class="tip">예) 식판을 비우면 [지구가 웃는다] · 공식(단점→장점·숫자·질문·반전·리듬)을 꼭 하나 넣어 보세요.</p>
+<label>서브 카피 (설명 한두 줄)</label><textarea id="sb" maxlength="70" placeholder="예: 오늘 급식, 먹을 만큼 받고 남김없이! 잔반 0g 챌린지"></textarea>
+<label>해시태그</label><input id="tg" maxlength="24" placeholder="예: #잔반제로챌린지">
+<label>만든 사람</label><input id="by" maxlength="24" placeholder="예: 2학년 3반 카피천재들">
+</div>
+
+<h2><b>3</b>디자인 고르기</h2>
+<div class="card">
+<label>틀</label><div class="chips" id="tpl"></div>
+<label>색깔</label><div class="sw" id="sw"></div>
+<label>그림</label><div class="chips" id="imgm"></div>
+<input type="file" id="up" accept="image/*" style="display:none">
+<p class="tip">‘내 사진’을 고르면 직접 그린 그림이나 찍은 사진을 넣을 수 있어요.</p>
+</div>
+</div>
+<div class="pv"><canvas id="cv" width="1240" height="1754"></canvas>
+<button class="btn o full" id="dl">⬇ 포스터 이미지 저장 (PNG)</button>
+<p class="tip">저장이 안 되면 포스터를 길게 눌러 ‘이미지 저장’을 하세요.</p></div>
+</div></main>
+<footer>바로교육연구소 · 카피 연구소</footer>
+<script>
+const TP=[["c_lunch","급식 다 먹기","식판을 비우면 [지구가 웃는다]"],["c_hall","복도에서 걷기","뛰면 3초 빨리, 다치면 [3주] 늦게"],
+["c_words","고운 말 쓰기","말 한마디가 [친구의 하루]를 바꿉니다"],["c_recycle","분리배출","버리는 게 아닙니다. [다시 태어나는] 겁니다"],
+["c_hello","먼저 인사하기","인사는 3초, [기분은 하루 종일]"],["c_tidy","교실 정리정돈","책상이 웃으면 [교실이 웃는다]"]];
+const COL=[["#1554CA","#FFD43B"],["#E8590C","#FFF3BF"],["#2B8A3E","#FFE066"],["#7048E8","#FFC9E0"],["#212529","#FF6B35"]];
+const TPL=["블록형","말풍선형","글자형"],IM=["주제 그림","내 사진","그림 없음"];
+const $=id=>document.getElementById(id),K="copy_poster",cv=$("cv"),x=cv.getContext("2d"),W=1240,H=1754;
+let st={t:0,c:0,p:0,m:0};try{Object.assign(st,JSON.parse(localStorage.getItem(K)||"{}"))}catch(e){}
+try{if(!st.by)st.by=localStorage.getItem("copy_team")||""}catch(e){}
+const save=()=>{const s={...st};delete s.photo;try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}};
+let img=new Image(),photo=null;
+function chips(id,arr,key){$(id).innerHTML=arr.map((a,i)=>`<button data-i="${i}" class="${st[key]==i?"on":""}">${a}</button>`).join("");
+ $(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{st[key]=+b.dataset.i;if(key=="m"&&st.m==1&&!photo)$("up").click();save();chips(id,arr,key);draw()})}
+function ui(){$("topics").innerHTML=TP.map((t,i)=>`<button data-i="${i}" class="${st.t==i?"on":""}"><img src="img/${t[0]}.jpg" alt="">${t[1]}</button>`).join("");
+ $("topics").querySelectorAll("button").forEach(b=>b.onclick=()=>{st.t=+b.dataset.i;$("hd").placeholder=TP[st.t][2];loadImg();save();ui()});
+ $("sw").innerHTML=COL.map((c,i)=>`<button data-i="${i}" class="${st.c==i?"on":""}" style="background:${c[0]}"></button>`).join("");
+ $("sw").querySelectorAll("button").forEach(b=>b.onclick=()=>{st.c=+b.dataset.i;save();ui();draw()});
+ chips("tpl",TPL,"p");chips("imgm",IM,"m");$("hd").placeholder=TP[st.t][2]}
+["hd","sb","tg","by"].forEach(k=>{$(k).value=st[k]||"";$(k).oninput=()=>{st[k]=$(k).value;save();draw()}});
+$("up").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{photo=new Image();photo.onload=draw;photo.src=r.result};r.readAsDataURL(f)};
+function loadImg(){img=new Image();img.onload=draw;img.src="img/"+TP[st.t][0]+".jpg"}
+const FF='"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif';
+function parse(s){const out=[];let hl=false;for(const ch of s){if(ch=="["){hl=true;continue}if(ch=="]"){hl=false;continue}out.push({ch,hl})}return out}
+function wrap(chars,size,maxW,weight){x.font=`${weight} ${size}px ${FF}`;const words=[];let cur=[];
+ for(const c of chars){if(c.ch==" "){if(cur.length)words.push(cur);words.push([c]);cur=[]}else cur.push(c)}if(cur.length)words.push(cur);
+ const lines=[];let line=[],lw=0;const wd=w=>x.measureText(w.map(c=>c.ch).join("")).width;
+ for(const w of words){const ww=wd(w);if(w[0].ch==" "){if(line.length){line.push(...w);lw+=ww}continue}
+  if(lw+ww>maxW&&line.length){while(line.length&&line[line.length-1].ch==" ")line.pop();lines.push(line);line=[];lw=0}
+  if(ww>maxW){for(const c of w){const cw=wd([c]);if(lw+cw>maxW&&line.length){lines.push(line);line=[];lw=0}line.push(c);lw+=cw}}else{line.push(...w);lw+=ww}}
+ if(line.length)lines.push(line);return lines}
+function fit(chars,maxW,maxH,maxSize,minSize,weight,lh){for(let s=maxSize;s>=minSize;s-=4){const L=wrap(chars,s,maxW,weight);if(L.length*s*lh<=maxH)return[s,L]}return[minSize,wrap(chars,minSize,maxW,weight)]}
+function drawLines(L,size,cx,y,lh,col,hcol,weight,mode,align="c"){x.font=`${weight} ${size}px ${FF}`;x.textBaseline="alphabetic";x.textAlign="left";
+ L.forEach((line,k)=>{const tw=x.measureText(line.map(c=>c.ch).join("")).width;let px=align=="c"?cx-tw/2:cx;const by=y+size*(k+1)*lh-size*(lh-1)/2-size*.12;
+  for(const c of line){const cw=x.measureText(c.ch).width;
+   if(c.hl&&mode=="mark"){x.fillStyle=hcol;x.fillRect(px-1,by-size*.38,cw+2,size*.42)}
+   x.fillStyle=c.hl&&mode=="color"?hcol:col;x.fillText(c.ch,px,by);px+=cw}})}
+function rr(X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
+function cover(im,X,Y,w,h,r){if(!im||!im.complete||!im.naturalWidth)return;const k=Math.max(w/im.naturalWidth,h/im.naturalHeight),iw=im.naturalWidth*k,ih=im.naturalHeight*k;
+ x.save();rr(X,Y,w,h,r);x.clip();x.drawImage(im,X+(w-iw)/2,Y+(h-ih)/2,iw,ih);x.restore()}
+function plain(s,size,cx,y,maxW,col,weight=700,lh=1.35,maxL=3){const L=wrap(parse(s),size,maxW,weight).slice(0,maxL);drawLines(L,size,cx,y,lh,col,col,weight,"none");return L.length*size*lh}
+function draw(){const [c1,c2]=COL[st.c],hd=parse((st.hd||"").trim()||TP[st.t][2]),sb=st.sb||"",tg=st.tg||"",by=st.by||"",pic=st.m==0?img:st.m==1?photo:null;
+ x.clearRect(0,0,W,H);
+ if(st.p==0){x.fillStyle=c1;x.fillRect(0,0,W,H);
+  x.fillStyle="rgba(255,255,255,.18)";rr(80,80,420,70,35);x.fill();x.fillStyle="#fff";x.font=`800 34px ${FF}`;x.textAlign="left";x.fillText("우리 학교 캠페인",112,128);
+  const [s,L]=fit(hd,1080,pic?440:820,150,64,900,1.22);drawLines(L,s,W/2,190,1.22,"#fff",c2,900,"color");
+  const top=190+L.length*s*1.22+40;if(pic)cover(pic,80,top,1080,Math.min(720,1450-top),36);
+  x.fillStyle="#fff";rr(0,1470,W,284,0);x.fill();x.fillStyle=c1;x.fillRect(0,1470,W,12);
+  plain(sb,44,W/2,1500,1080,"#222",700,1.35,2);x.font=`800 40px ${FF}`;x.fillStyle=c1;x.textAlign="center";x.fillText([tg,by].filter(Boolean).join("   ·   "),W/2,1712)}
+ else if(st.p==1){x.fillStyle="#FFFDF5";x.fillRect(0,0,W,H);
+  if(pic)cover(pic,0,0,W,900,0);else{x.fillStyle=c2;x.fillRect(0,0,W,900)}
+  x.fillStyle="#fff";x.strokeStyle=c1;x.lineWidth=12;rr(70,760,1100,640,60);x.fill();x.stroke();
+  x.beginPath();x.moveTo(230,770);x.lineTo(300,650);x.lineTo(380,770);x.closePath();x.fill();x.stroke();x.fillStyle="#fff";x.fillRect(236,762,138,22);
+  const [s,L]=fit(hd,980,520,140,60,900,1.22);drawLines(L,s,W/2,760+(640-L.length*s*1.22)/2,1.22,"#1B2333",c1,900,"color");
+  plain(sb,44,W/2,1440,1060,"#333",700,1.35,2);x.font=`800 42px ${FF}`;x.fillStyle=c1;x.textAlign="center";x.fillText(tg,W/2,1640);
+  x.font=`600 34px ${FF}`;x.fillStyle="#666";x.fillText(by,W/2,1700)}
+ else{x.fillStyle=c2;x.fillRect(0,0,W,H);x.fillStyle=c1;x.fillRect(0,0,W,26);x.fillRect(0,H-26,W,26);
+  x.font=`800 40px ${FF}`;x.fillStyle=c1;x.textAlign="center";x.fillText("— 우리 학교 캠페인 —",W/2,150);
+  const [s,L]=fit(hd,1080,pic?700:1000,200,72,900,1.2);const y0=pic?230:(H-L.length*s*1.2)/2-120;drawLines(L,s,W/2,y0,1.2,"#1B2333","rgba(255,255,255,.85)",900,"mark");
+  let yy=y0+L.length*s*1.2+50;if(pic){const ph=Math.min(560,1460-yy-170);if(ph>200){x.save();x.beginPath();x.arc(W/2,yy+ph/2,ph/2,0,7);x.clip();cover(pic,W/2-ph/2,yy,ph,ph,0);x.restore();yy+=ph+40}}
+  plain(sb,46,W/2,yy,1060,"#333",700,1.35,2);x.font=`900 46px ${FF}`;x.fillStyle=c1;x.textAlign="center";x.fillText(tg,W/2,1600);
+  x.font=`600 34px ${FF}`;x.fillStyle="#555";x.fillText(by,W/2,1670)}
+ x.textAlign="left"}
+$("dl").onclick=()=>{cv.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="캠페인포스터_"+(st.by||"우리모둠").replace(/\s+/g,"_")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)},"image/png")};
+ui();loadImg();(document.fonts?document.fonts.load(`900 80px Pretendard`).catch(()=>{}):Promise.resolve()).then(draw);
+</script></body></html>
